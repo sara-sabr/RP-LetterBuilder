@@ -1,0 +1,5 @@
+#Ignore Documents and Excel
+*.docx
+*.xlsb
+*.pdf
+configuration.properties

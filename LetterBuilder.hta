@@ -367,10 +367,10 @@
 
 		div.form-field>span.validationStatusErrorMessage {
 			display: none;
-			text-align: left;
+			/* text-align: left;
 			margin-left: 150px;
 			width: 70%;
-			padding-left: 5px;
+			padding-left: 5px; */
 		}
 
 		div.form-field-error>span.validationStatusErrorMessage {
@@ -1732,7 +1732,7 @@
 		     ========================================= -->
 
 		<!-- RFL Letter Select Page 1 -->
-		<div id="page-1" data-pageNo="1" class="page">
+		<div id="page-101" data-pageNo="101" class="page">
 			<div class="pageContent col-xs-12">
 
 				<h2 class="col-xs-8 col-xs-offset-2 text-grey">What letter would you like to work on?</h2>
@@ -1772,7 +1772,7 @@
 		</div>
 
 		<!-- RFL Page 2 -->
-		<div id="page-2" data-pageNo="2" class="page">
+		<div id="page-102" data-pageNo="102" class="page">
 			<p class="pageSubTitle" id="page1Subtitle">Are the files installed correctly?</p>
 			<div class="pageContent pageMiddle col-xs-12">
 				<div class="pageMiddleContent">
@@ -1830,7 +1830,7 @@
 		</div>
 
 		<!-- RFL Page 3 -->
-		<div id="page-3" data-pageNo="3" class="page">
+		<div id="page-103" data-pageNo="103" class="page">
 			<p class="pageSubTitle" id="page2Subtitle">Enter PRI</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
@@ -1850,7 +1850,7 @@
 		</div>
 
 		<!-- RFL Page 4 -->
-		<div id="page-4" date-pageNo="4" class="page">
+		<div id="page-104" date-pageNo="104" class="page">
 
 			<div class="col-xs-12">
 				<h3 class="text-grey">Verify Information</h3>
@@ -2128,7 +2128,7 @@
 		</div>
 
 		<!-- Page 1 -->
-		<div id="page-101" data-pageNo="101" class="page">
+		<div id="page-1" data-pageNo="1" class="page">
 			<p class="pageSubTitle" id="page1Subtitle">Are the files installed correctly?</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
@@ -2210,7 +2210,7 @@
 		</div>
 
 		<!-- Page 2 -->
-		<div id="page-102" data-pageNo="102" class="page">
+		<div id="page-2" data-pageNo="2" class="page">
 			<p class="pageSubTitle" id="page2Subtitle">Enter PRI</p>
 			<div class="pageContent pageMiddle col-xs-12">
 				<div class="pageMiddleContent">
@@ -2229,8 +2229,8 @@
 			</div>
 		</div>
 
-		<!-- Page 3 -->
-		<div id="page-103" data-pageNo="103" class="page">
+		<!-- Old Page 3 for LWOP letter -->
+		<div id="page-993" data-pageNo="993" class="page">
 			<span id="page3Instruction" class="hidden"></span>
 
 			<div class="col-xs-12">
@@ -2454,8 +2454,307 @@
 			</div>
 		</div>
 
+		<!-- Page 3 -->
+		<div id="page-3" date-pageNo="3" class="page">
+			<span id="page3Instruction" class="hidden col-xs-12"></span>
+
+			<div class="col-xs-12">
+				<h3 id="page3Subtitle" class="text-grey">Verify Information</h3>
+			</div>
+
+			<div class="pageContent col-xs-12">
+				<form class="cad-form" onchange="validateForm()">
+
+					<span class="col-xs-12 mrgn-tp-lg"></span>
+
+					<div class="col-xs-7 label-button-lrg">
+						<p class="text-large text-left">Please verify employee information:</p>
+					</div>
+
+					<div class="col-xs-5">
+						<button id="reload-cad" title="Reload" class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields()">
+							<img src="assets/img/reload.png"> <span id="page3-reloadbutton">Reset to default</span>
+						</button>
+					</div>
+
+					<span class="col-xs-12 mrgn-bttm-lg"></span>
+
+					<div class="col-xs-6 form-field">
+						<label id="PaylistLabel" for="Paylist">Paylist</label>
+						<input id="Paylist" type="text" class="cadField" placeholder="####">
+					</div>
+
+					<div class="col-xs-6 form-field">
+						<label id="PRILabel" for="PRI">PRI</label>
+						<input id="PRI" type="text" class="cadField" readonly>
+					</div>
+
+					<div class="col-xs-6 form-field">
+						<label id="EffectiveDateLabel" for="Date">Effective Date</label>
+						<input id="EffectiveDate" type="text" class="cadField" placeholder="DD/MM/YYYY">
+						<span class="validationStatusErrorMessage" id="page3InvalidDate">Invalid Date</span>
+					</div>
+
+					<div class="col-xs-6 form-field">
+						<label id="CaseNumberLabel" for="CaseNumber">Case #</label>
+						<input id="CaseNumber" type="text" class="cadField" placeholder="######">
+					</div>
+
+					<div class="col-xs-12 form-field">
+						<label id="EENameLabel" for="EEName">Name</label>
+						<input id="EEName" type="text" class="cadField" readonly>
+					</div>
+
+					<div class="col-xs-12 form-field">
+						<label id="PersonalEmailLabel" for=" Email">Personal Email (Employee)</label>
+						<input id="PersonalEmail" type="text" class="cadField">
+					</div>
+
+					<div class="form-field hidden">
+						<label for="EEStreet" id="EEStreetLabel">Employee Address</label>
+						<input type="text" class="cadField" id="EEStreet" name="EmployeeStreet1">
+					</div>
+					<div class="form-field hidden">
+						<label for="EECity" id="EECityLabel">Employee City</label>
+						<input type="text" class="cadField" id="EECity" name="EmployeeCity">
+					</div>
+					<div class="form-field hidden">
+						<label for="EEProvince" id="EEProvinceLabel">Employee Province</label>
+						<input type="text" class="cadField" id="EEProvince" name="EmployeeProvince">
+					</div>
+					<div class="form-field hidden">
+						<label for="EEPostalCode" id="EEPostalCodeLabel">Employee Postal Code</label>
+						<input type="text" class="cadField" id="EEPostalCode" name="EmployeePostalCode">
+					</div>
+
+					<div class="col-xs-12 form-field">
+						<label id="ReasonLabel" for="Reason">Reason</label>
+						<input id="Reason" type="text" class="cadField" readonly>
+					</div>
+
+					<span class="col-xs-12 mrgn-tp-lg"></span>
+
+					<div class="col-xs-7 label-button-lrg">
+						<p id="Page3InstructionsLabel" class="text-large text-left">Letter Customizations:</p>
+					</div>
+
+					<div class="col-xs-5">
+						<button class="btn btn-default btn-lg pull-right"><img src="assets/img/reload.png"> Reset to default</button>
+					</div>
+
+					<span class="col-xs-12 mrgn-bttm-lg"></span>
+
+					<span id="Page3InstructionsText" class="col-xs-12 text-large text-left mrgn-bttm-lg">
+						Content with checkmarks are loaded by default based on the information collected from the CAD.
+						Please review and select or unselect as needed. Selecting field will add to the generated letter,
+						unselected fields will not be displayed on the letter.
+					</span>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="Pension" class="btn btn-default " type="checkbox"></input>
+							<label id="PensionLabel" for="Pension" class="mrgn-lft-md">Pension</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="DisabilityInsurance" class="btn btn-default " type="checkbox"></input>
+							<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-0">
+						<div class="form-checkbox pull-left">
+							<input id="PSMIP" class="btn btn-default " type="checkbox"></input>
+							<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
+						</div>
+					</div>
+
+					<div id="IANField" class="col-xs-11 checkbox-type-input">
+						<div class="col-xs-5">
+							<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<input id="IAN" type="text" class="cadField"></input>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-0">
+						<div class="form-checkbox pull-left">
+							<input id="PSHCP" class="btn btn-default " type="checkbox"></input>
+							<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
+						</div>
+					</div>
+
+					<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
+						<div class='col-xs-5'>
+							<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<input id="PSHCPNo" type="text" class="cadField"></input>
+							</div>
+						</div>
+						<div class='col-xs-5'>
+							<div id="PSHCPLevelLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<select id="PSHCPLevel" type="text" class="cadField">
+									<option>Select</option>
+									<option>Single Level I</option>
+									<option>Single Level II</option>
+									<option>Single Level III</option>
+									<option>Family Level I</option>
+									<option>Family Level II</option>
+									<option>Family Level III</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-0">
+						<div class="form-checkbox pull-left">
+							<input id="DCP" class="btn btn-default " type="checkbox"></input>
+							<label id="DCPLabel" for="DCP" class="mrgn-lft-md">DCP</label>
+						</div>
+					</div>
+
+					<div id="DCPField" class="col-xs-11 checkbox-type-input">
+						<div class='col-xs-5'>
+							<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<input id="DCPPlanNo" type="text" class="cadField"></input>
+							</div>
+						</div>
+						<div class='col-xs-5'>
+							<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<input id="CertificateNumber" type="text" class="cadField"></input>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="UnionInsurance" class="btn btn-default " type="checkbox"></input>
+							<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md">Union Insurance</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="BilingualBonus" class="btn btn-default " type="checkbox"></input>
+							<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-0">
+						<div class="form-checkbox pull-left">
+							<input id="AnnualandSickLeave" class="btn btn-default " type="checkbox"></input>
+							<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
+						</div>
+					</div>
+
+					<div id="AWWField" class="col-xs-11 checkbox-type-input">
+						<div class='col-xs-5'>
+							<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">AWW</div>
+							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+								<input id="AWW" type="text" class="cadField"></input>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="CompensatoryLeave" class="btn btn-default " type="checkbox"></input>
+							<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="PayRevision" class="btn btn-default " type="checkbox"></input>
+							<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="ContinuousService" class="btn btn-default " type="checkbox"></input>
+							<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="TermEmployment" class="btn btn-default " type="checkbox"></input>
+							<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="UnionDues" class="btn btn-default " type="checkbox"></input>
+							<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="RA" class="btn btn-default " type="checkbox"></input>
+							<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="CreditUnion" class="btn btn-default " type="checkbox"></input>
+							<label id="CreditUnionLabel for=" CreditUnion" class="mrgn-lft-md">Credit Union</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="GOC" class="btn btn-default " type="checkbox"></input>
+							<label id="GOCLabel" for="GOC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="Garnishments" class="btn btn-default " type="checkbox"></input>
+							<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="StudentLoans" class="btn btn-default " type="checkbox"></input>
+							<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="LIA" class="btn btn-default " type="checkbox"></input>
+							<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
+						</div>
+					</div>
+
+					<div class="col-xs-12 mrgn-bttm-md">
+						<div class="form-checkbox pull-left">
+							<input id="Selffunded" class="btn btn-default " type="checkbox"></input>
+							<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="actionBar col-xs-12">
+				<button class="actionButton pull-right" id="page3ButtonGenerateEn" onClick="GoToPage(4,event)">Generate Letter</button>
+			</div>
+		</div>
+
 		<!-- Page 4 -->
-		<div id="page-104" data-pageNo="104" class="page">
+		<div id="page-4" data-pageNo="4" class="page">
 			<p class="pageSubTitle" id="page4Subtitle">Review and Export</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
@@ -2470,7 +2769,7 @@
 		</div>
 
 		<!-- Page 5 -->
-		<div id="page-105" data-pageNo="105" class="page">
+		<div id="page-5" data-pageNo="5" class="page">
 			<p class="pageSubTitle" id="page5Subtitle">Ready to be sent to EPOST</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">

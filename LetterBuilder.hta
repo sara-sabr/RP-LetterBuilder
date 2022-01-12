@@ -1822,7 +1822,7 @@
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label for="selectLetter">Letter Type</label>
 
-					<select id="selectLetter" class="cadField">
+					<select id="selectLetter" class="cadField" name="selectLetter">
 						<option>Care of Immediate Familiy</option>
 						<option>LWOP Vaccine</option>
 						<option>Other LWOP</option>
@@ -1834,7 +1834,7 @@
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label>Language of Letter</label>
-					<select id="selectLanguage" class="cadField">
+					<select id="selectLanguage" class="cadField" name="selectLanguage">
 						<option>English</option>
 						<option>French</option>
 					</select>
@@ -1842,7 +1842,7 @@
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label for="inputEffectiveDate">Effective Date of Pay Action</label>
-					<input type="text" id="inputEffectiveDate" class="cadField">
+					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate">
 				</div>
 			</div>
 
@@ -1953,37 +1953,37 @@
 
 					<div class="col-xs-6 form-field">
 						<label id="PaylistLabel" for="Paylist">Paylist</label>
-						<input id="Paylist" type="text" class="cadField" placeholder="####">
+						<input id="Paylist" type="text" class="cadField" placeholder="####" name="PayList">
 					</div>
 
 					<div class="col-xs-6 form-field">
 						<label id="PRILabel" for="PRI">PRI</label>
-						<input id="PRI" type="text" class="cadField" readonly>
+						<input id="PRI" type="text" class="cadField" readonly name="PRI">
 					</div>
 
 					<div class="col-xs-6 form-field">
-						<label id="DateLabel" for="Date">Effective Date</label>
-						<input id="Date" type="text" class="cadField" placeholder="DD/MM/YYYY">
+						<label id="EffectiveDateLabel" for="Date">Effective Date</label>
+						<input id="EffectiveDate" type="text" class="cadField" placeholder="DD/MM/YYYY" name="EffectiveDate">
 					</div>
 
 					<div class="col-xs-6 form-field">
 						<label id="CaseNumberLabel" for="CaseNumber">Case #</label>
-						<input id="CaseNumber" type="text" class="cadField" placeholder="######">
+						<input id="CaseNumber" type="text" class="cadField" placeholder="######" name="CaseNumber">
 					</div>
 
 					<div class="col-xs-12 form-field">
 						<label id="EENameLabel" for="EEName">Name</label>
-						<input id="EEName" type="text" class="cadField" readonly>
+						<input id="EEName" type="text" class="cadField" readonly name="EEName">
 					</div>
 
 					<div class="col-xs-12 form-field">
 						<label id="PersonalEmailLabel" for=" Email">Personal Email (Employee)</label>
-						<input id="PersonalEmail" type="text" class="cadField">
+						<input id="PersonalEmail" type="text" class="cadField" name="PersonalEmail">
 					</div>
 
 					<div class="col-xs-12 form-field">
 						<label id="ReasonLabel" for="Reason">Reason</label>
-						<input id="Reason" type="text" class="cadField" readonly>
+						<input id="Reason" type="text" class="cadField" readonly name="Reason">
 					</div>
 
 					<span class="col-xs-12 mrgn-tp-lg"></span>
@@ -2006,21 +2006,21 @@
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="Pension" class="btn btn-default " type="checkbox"></input>
-							<label id="PensionLabel" for="Pension" class="mrgn-lft-md">Pension</label>
+							<input id="PensionandDSB" class="btn btn-default " type="checkbox" name="PensionandDSB"></input>
+							<label id="PensionandDSBLabel" for="Pension" class="mrgn-lft-md">Pension and Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="DisabilityInsurance" class="btn btn-default " type="checkbox"></input>
+							<input id="DisabilityInsurance" class="btn btn-default " type="checkbox" name="DisabilityInsurance"></input>
 							<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="PSMIP" class="btn btn-default " type="checkbox"></input>
+							<input id="PSMIP" class="btn btn-default " type="checkbox" name="PSMIP"></input>
 							<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
 						</div>
 					</div>
@@ -2029,14 +2029,14 @@
 						<div class="col-xs-5">
 							<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="IAN" type="text" class="cadField"></input>
+								<input id="IAN" type="text" class="cadField" name="PSMIPNo"></input>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="PSHCP" class="btn btn-default " type="checkbox"></input>
+							<input id="PSHCP" class="btn btn-default " type="checkbox" name="PSHCP"></input>
 							<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
 						</div>
 					</div>
@@ -2045,13 +2045,13 @@
 						<div class='col-xs-5'>
 							<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="PSHCPNo" type="text" class="cadField"></input>
+								<input id="PSHCPNo" type="text" class="cadField" name="PSHCPNo"></input>
 							</div>
 						</div>
 						<div class='col-xs-5'>
 							<div id="PSHCPLevelLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<select id="PSHCPLevel" type="text" class="cadField">
+								<select id="PSHCPLevel" type="text" class="cadField" name="PSHCPLevel">
 									<option>Select</option>
 									<option>Single Level I</option>
 									<option>Single Level II</option>
@@ -2066,7 +2066,7 @@
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="DCP" class="btn btn-default " type="checkbox"></input>
+							<input id="DCP" class="btn btn-default " type="checkbox" name="DCP"></input>
 							<label id="DCPLabel" for="DCP" class="mrgn-lft-md">DCP</label>
 						</div>
 					</div>
@@ -2075,34 +2075,34 @@
 						<div class='col-xs-5'>
 							<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="DCPPlanNo" type="text" class="cadField"></input>
+								<input id="DCPPlanNo" type="text" class="cadField" name="DCPPlanNo"></input>
 							</div>
 						</div>
 						<div class='col-xs-5'>
 							<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="CertificateNumber" type="text" class="cadField"></input>
+								<input id="CertificateNumber" type="text" class="cadField" name="CertificateNumber"></input>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="UnionInsurance" class="btn btn-default " type="checkbox"></input>
+							<input id="UnionInsurance" class="btn btn-default " type="checkbox" name="UnionInsurance"></input>
 							<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md">Union Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="BilingualBonus" class="btn btn-default " type="checkbox"></input>
+							<input id="BilingualBonus" class="btn btn-default " type="checkbox" name="BilingualBonus"></input>
 							<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="AnnualandSickLeave" class="btn btn-default " type="checkbox"></input>
+							<input id="AnnualandSickLeave" class="btn btn-default " type="checkbox" name="AnnualandSickLeave"></input>
 							<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
 						</div>
 					</div>
@@ -2111,91 +2111,91 @@
 						<div class='col-xs-5'>
 							<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">AWW</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="AWW" type="text" class="cadField"></input>
+								<input id="AWW" type="text" class="cadField" name="AWW"></input>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="CompensatoryLeave" class="btn btn-default " type="checkbox"></input>
+							<input id="CompensatoryLeave" class="btn btn-default " type="checkbox" name="CompensatoryLeave"></input>
 							<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="PayRevision" class="btn btn-default " type="checkbox"></input>
+							<input id="PayRevision" class="btn btn-default " type="checkbox" name="PayRevision"></input>
 							<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="ContinuousService" class="btn btn-default " type="checkbox"></input>
+							<input id="ContinuousService" class="btn btn-default " type="checkbox" name="ContinuousService"></input>
 							<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="TermEmployment" class="btn btn-default " type="checkbox"></input>
+							<input id="TermEmployment" class="btn btn-default " type="checkbox" name="TermEmployment"></input>
 							<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="UnionDues" class="btn btn-default " type="checkbox"></input>
+							<input id="UnionDues" class="btn btn-default " type="checkbox" name="UnionDues"></input>
 							<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="RA" class="btn btn-default " type="checkbox"></input>
+							<input id="RA" class="btn btn-default " type="checkbox" name="RA"></input>
 							<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="CreditUnion" class="btn btn-default " type="checkbox"></input>
-							<label id="CreditUnionLabel for=" CreditUnion" class="mrgn-lft-md">Credit Union</label>
+							<input id="CreditUnion" class="btn btn-default " type="checkbox" name="CreditUnion"></input>
+							<label id="CreditUnionLabel" for=" CreditUnion" class="mrgn-lft-md">Credit Union</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="GOC" class="btn btn-default " type="checkbox"></input>
+							<input id="GOC" class="btn btn-default " type="checkbox" name="GOC"></input>
 							<label id="GOCLabel" for="GOC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="Garnishments" class="btn btn-default " type="checkbox"></input>
+							<input id="Garnishments" class="btn btn-default " type="checkbox" name="Garnishments"></input>
 							<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="StudentLoans" class="btn btn-default " type="checkbox"></input>
+							<input id="StudentLoans" class="btn btn-default " type="checkbox" name="StudentLoans"></input>
 							<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="LIA" class="btn btn-default " type="checkbox"></input>
+							<input id="LIA" class="btn btn-default " type="checkbox" name="LIA"></input>
 							<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="Selffunded" class="btn btn-default " type="checkbox"></input>
+							<input id="Selffunded" class="btn btn-default " type="checkbox" name="Selffunded"></input>
 							<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
 						</div>
 					</div>
@@ -2203,7 +2203,7 @@
 			</div>
 
 			<div class="actionBar col-xs-12">
-				<button class="actionButton pull-right" id="page3ButtonGenerateEn" onClick="GoToPage(4,event)">Generate Letter</button>
+				<button class="actionButton pull-right" id="page3ButtonGenerate" onClick="GoToPage(4,event)">Generate Letter</button>
 			</div>
 		</div>
 

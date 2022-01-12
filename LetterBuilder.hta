@@ -465,12 +465,13 @@
 	<script type="text/vbscript">
 	' User modifiable Constants
 	' =======================================
-	const FN_ENGLISH_LETTER = "5 Other LWOP.docx"
-	const FN_FRENCH_LETTER = "5F CNP pour autres raisons.docx"
 	const FN_CAD = "CAD.xlsb"
-	const FN_ENGLISH_PSHCP_OPTIONS = "PSHCP LWOP Options.pdf"
-	const FN_FRENCH_PSHCP_OPTIONS = "RÉGIME DE SOINS DE SANTÉ DE LA FONCTION PUBLIQUE (RSSFP).pdf"
 	const FN_CONFIG = "configuration.properties"
+	const MOD_CONFIG = "info.properties"
+	const MOD_SUFFIX_EN = "-EN.docx"
+	const MOD_SUFFIX_FR = "-FR.docx"
+	const MOD_ATTACHMENTS_EN = "AttachmentsEN"
+	const MOD_ATTACHMENTS_FR = "AttachmentsFR"
 
 	' Configs
 	' =======================================
@@ -599,19 +600,24 @@
 	Dim configurationSettings
 	Set configurationSettings = CreateObject("Scripting.Dictionary")
 
+	' List of installed modules
+	Dim modulesAvailable
+	Set modulesAvailable = CreateObject("Scripting.Dictionary")
+
 	' Shell object
 	Set objShell = CreateObject("WScript.Shell")
 	currentDirectory = objShell.CurrentDirectory
 
+	' List of Attachments
+	Dim attachmentsEN, attachmentsFR
+	Set attachmentsEN = CreateObject("System.Collections.ArrayList")
+	Set attachmentsFR = CreateObject("System.Collections.ArrayList")
+
 	' Properties
 	' =======================================
-	Dim cadFile, letterEnFile, letterFrFile, workingLetterFile, pshcpOptionsEnFile, pshcpOptionsFrFile, configFiie
+	Dim cadFile, letterEnFile, letterFrFile, workingLetterFile, configFile
 	cadFile = currentDirectory & "\" & FN_CAD
-	letterEnFile = currentDirectory & "\" & FN_ENGLISH_LETTER
-	letterFrFile = currentDirectory & "\" & FN_FRENCH_LETTER
-	pshcpOptionsEnFile = currentDirectory & "\" & FN_ENGLISH_PSHCP_OPTIONS
-	pshcpOptionsFrFile = currentDirectory & "\" & FN_FRENCH_PSHCP_OPTIONS
-	configFiie = currentDirectory & "\" & FN_CONFIG
+	configFile = currentDirectory & "\" & FN_CONFIG
 
 	' Debug Flags
 	' =======================================
@@ -634,31 +640,6 @@
 		Public BetweenExpressionB
 	End Class
 
-	Sub LoadConfig()
-		Set fso = CreateObject("Scripting.FileSystemObject")
-		Set fileHandler = fso.OpenTextFile(configFiie)
-		Dim line, keyValueDelimIdx, key, value
-
-		Do Until fileHandler.AtEndOfStream
-			line = fileHandler.ReadLine
-			line = Trim(line)
-
-			' See if comment line
-			keyValueDelimIdx = InStr(line, "#")
-
-			if keyValueDelimIdx <> 1 Then
-				' Not comment line, so lets read the key value pair delimited by "="
-				keyValueDelimIdx = InStr(line, "=")
-
-				If keyValueDelimIdx <> 0 AND keyValueDelimIdx <> Len(line) Then
-					key = Mid(line, 1, keyValueDelimIdx - 1)
-					value = Mid(line, keyValueDelimIdx + 1)
-					configurationSettings.Add key, value
-				End If
-			End If
-		Loop
-		fileHandler.Close
-	End Sub
 
 	' Functions
 	' =======================================
@@ -689,19 +670,44 @@
 		Set excelApplication = Nothing
 	End Sub
 
+	'Check for available modules and add them to a list
+	Sub CheckAvailableModules()
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		Dim fileSuffix, languageCode, moduleName, propertyFile
+		languageCode = document.getElementById("html").lang
+		If languageCode = "fr" Then
+			fileSuffix = MOD_SUFFIX_FR
+		Else
+			fileSuffix = MOD_SUFFIX_EN
+		End If
+
+		For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
+			For Each file in objFolder.Files
+				' Grab all files that end with -EN.docx and -FR.docx in all the template folders
+				If instr(file.name, fileSuffix) <> 0 Then
+				moduleName = Replace(file.name, fileSuffix, "")
+				ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
+				propertyFile = file.Path
+				End If
+			Next
+			If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
+				modulesAvailable.Add moduleName, propertyFile
+			End If
+		Next
+	End Sub
+
 	' Verify installation is good.
 	Sub CheckInstall()
+		CheckAvailableModules()
+		LoadSelectedModule("LWOP Vaccine")
 		Call UpdateValidationStatusEntry("page1CadFileLabel", cadFile)
 		Call UpdateValidationStatusEntry("page1EnLtrLabel", letterEnFile)
 		Call UpdateValidationStatusEntry("page1FrLtrLabel", letterFrFile)
-		Call UpdateValidationStatusEntry("page1EnPSHCPOptLabel", pshcpOptionsEnFile)
-		Call UpdateValidationStatusEntry("page1FrPSHCPOptLabel", pshcpOptionsFrFile)
 
 		If FileExists(cadFile) AND _
 		   FileExists(letterEnFile) AND _
 		   FileExists(letterFrFile) AND _
-		   FileExists(pshcpOptionsEnFile) AND _
-		   FileExists(pshcpOptionsFrFile) Then
+		   ValidateAttachments() Then
 			document.getElementById("page1ButtonStart").disabled = false
 			document.getElementById("recheck-install").className = "page1-recheckButtonbar hidden"
 		Else
@@ -897,6 +903,71 @@
 
 		Set myRange = Nothing
 	End Sub
+	
+	' Validate attachments
+	Function ValidateAttachments()
+		If CInt(configurationSettings("attachments.en")) = attachmentsEN.Count AND _
+		   CInt(configurationSettings("attachments.fr")) = attachmentsFR.Count Then
+			ValidateAttachments = True
+		Else
+			ValidateAttachments = False
+		End If
+	End Function
+
+	' Load module information
+	Function LoadSelectedModule(moduleName)
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		Dim moduleLocation, moduleProperties
+		moduleProperties = modulesAvailable(moduleName)
+		attachmentsEN.Clear
+		attachmentsFR.Clear
+		LoadConfig(moduleProperties)
+		moduleLocation = Replace(moduleProperties, "\" & MOD_CONFIG, "")
+		Set objFolder = fso.GetFolder(moduleLocation)
+		For Each file in objFolder.Files
+			If instr(file.name, MOD_SUFFIX_FR) Then
+				letterFrFile = file.Path
+			ElseIf instr(file.name, MOD_SUFFIX_EN) Then
+				letterEnFile = file.Path
+			End If
+		Next
+		For Each subfolder in objFolder.SubFolders 
+			For Each file in subfolder.Files
+				If instr(subfolder, MOD_ATTACHMENTS_EN) Then
+					attachmentsEN.Add file.Path
+				ElseIf instr(subfolder, MOD_ATTACHMENTS_FR) Then
+					attachmentsFR.Add file.Path
+				End If
+			Next
+		Next
+	End Function
+
+	' Read configuration files
+	Function LoadConfig(filePath)
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		Set fileHandler = fso.OpenTextFile(filePath)
+		Dim line, keyValueDelimIdx, key, value
+
+		Do Until fileHandler.AtEndOfStream
+			line = fileHandler.ReadLine
+			line = Trim(line)
+
+			' See if comment line
+			keyValueDelimIdx = InStr(line, "#")
+
+			if keyValueDelimIdx <> 1 Then
+				' Not comment line, so lets read the key value pair delimited by "="
+				keyValueDelimIdx = InStr(line, "=")
+
+				If keyValueDelimIdx <> 0 AND keyValueDelimIdx <> Len(line) Then
+					key = Mid(line, 1, keyValueDelimIdx - 1)
+					value = Mid(line, keyValueDelimIdx + 1)
+					configurationSettings.Add key, value
+				End If
+			End If
+		Loop
+		fileHandler.Close
+	End Function
 
 	' Get the standard file name. You must call this only after creating employeeRecord
 	Function GetFileNameToUse()
@@ -911,8 +982,13 @@
 		If monthPortion <  10 Then
 			monthPortion = "0" & monthPortion
 		End If
+		
+		If documentLanguage(1) = "French" Then
+			GetFileNameToUse = dayPortion & monthPortion & Year(Date) & configurationSettings("prefix.fr") & employeeRecord("EmployeeName")
+		Else
+			GetFileNameToUse = dayPortion & monthPortion & Year(Date) & configurationSettings("prefix.en") & employeeRecord("EmployeeName")
+		End IF
 
-		GetFileNameToUse = dayPortion & monthPortion & Year(Date) & "_LWOP_VACC_" & employeeRecord("EmployeeName")
 	End Function
 
 	' Get the case number. You must call this only after creating employeeRecord
@@ -1556,9 +1632,13 @@
 			.HTMLBody = EmailBody()
 			.Attachments.Add pdfFilePath
 			If documentLanguage(1) = "English" Then
-				.Attachments.Add pshcpOptionsEnFile
+				For Each attachment in attachmentsEN
+				.Attachments.Add attachment
+				Next
 			ElseIf documentLanguage(1) = "French" Then
-				.Attachments.Add pshcpOptionsFrFile
+				For Each attachment in attachmentsFR
+				.Attachments.Add attachment
+				Next
 			End If
             .Display
         End With
@@ -1688,7 +1768,7 @@
 	' =======================================
 	' This procedure is executing on program open
 	Sub window_onload()
-		LoadConfig()
+		LoadConfig(configFile)
 		'Opens the application on the left side of the screen
 		TranslateScreen "en", Nothing
 		GoToPage 1, Nothing

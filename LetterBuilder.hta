@@ -810,6 +810,16 @@
 		GenerateLetter(letterFrFile)
 	End Sub
 
+	' Adds in the slashes while typing in the effective Date
+	Sub EffectiveDateFormatting()
+		Dim currentDate
+		Set currentDate = document.getElementById("inputEffectiveDate")
+		If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
+			tempDate = currentDate.value & "/"
+			currentDate.value = tempDate
+		End If
+	End Sub
+
 	' Generate Letter Helper
 	Sub GenerateLetter(letterFile)
 		ToggleWordGenerateButtons(false)
@@ -936,6 +946,10 @@
 		End If
 	End Function
 
+	Function GetEffectiveDate()
+		GetEffectiveDate = document.getElementById("inputEffectiveDate").value
+	End Function
+
 	' Load module information
 	Function LoadSelectedModule(moduleName)
 		Set fso = CreateObject("Scripting.FileSystemObject")
@@ -1026,8 +1040,9 @@
 	' Populate Fields based on Manual Input
 	Function PopulateFieldsManualInput()
 		Set listOfInputs = document.getElementsByTagName("input")
+		Set listOfSelects = document.getElementsByTagName("select")
 		For Each inputField in listOfInputs
-			If inputField.className = "cadField" Then
+			If InStr(inputField.className, "cadField") Then
 				fieldName = inputField.name
 				If inputField.type = "checkbox" Then
 					If inputField.checked = true Then
@@ -1041,9 +1056,16 @@
 			End If
 		Next
 
+		For Each selectField in listOfSelects
+			If InStr(selectField.className, "cadField") Then
+				fieldName = selectField.name
+				employeeRecord(fieldName) = selectField.value
+			End If
+		Next
+
 		' check if the PSHCP level is 1 or 2/3 and set the status in the employee record
 		If employeeRecord("PSHCP") = "1" Then
-			If instr(employeeRecord("PSHCPLevel"), "Level I") Then
+			If instr(employeeRecord("PSHCPLevel"), "1") Then
 				employeeRecord("PSHCPLevel1") = "1"
 				employeeRecord("PSHCPLevel2Or3") = ""
 			Else
@@ -1065,7 +1087,7 @@
 		If tempResult <> "" Then
 			employeeRecord("EffectiveDate") = tempResult
 		Else
-			employeeRecord("EffectiveDate") = "15/11/2021"
+			employeeRecord("EffectiveDate") = GetEffectiveDate()
 		End If
 
 		Set PopulateFieldsManualInput = employeeRecord
@@ -1130,13 +1152,12 @@
 		' Effective Date or default to Nov 15
 		tempResult = SimpleFindRowUsingFilter(sheetJOB, "A2", employeeId, 2, 9, "JOB", 10, true)
 
-		MsgBox("test")
 
 		tempResult = validateAndFormatDate(tempResult)
 		If tempResult <> "" Then
 			cadDict.Add "EffectiveDate", tempResult
 		Else
-			cadDict.Add "EffectiveDate", "15/11/2021"
+			cadDict.Add "EffectiveDate", GetEffectiveDate()
 		End If
 
 		' Get Data Helpers
@@ -1230,8 +1251,10 @@
 		If IsNumeric(tempResult) Then
 			tempResult = FormatNumber(Round(tempResult * 2.0, 2), 2)
 			cadDict.Add "AWW", tempResult
+			cadDict.Add "AnnualandSickLeave", "1"
 		Else
 			cadDict.Add "AWW", 0
+			cadDict.Add "AnnualandSickLeave", ""
 		End If
 
 		' Get Status of Union Deductions
@@ -1861,7 +1884,7 @@
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label for="inputEffectiveDate">Effective Date of Pay Action</label>
-					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate">
+					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" onkeyup="EffectiveDateFormatting()">
 				</div>
 			</div>
 
@@ -2072,12 +2095,12 @@
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
 								<select id="PSHCPLevel" type="text" class="cadField" name="PSHCPLevel">
 									<option>Select</option>
-									<option>Single Level I</option>
-									<option>Single Level II</option>
-									<option>Single Level III</option>
-									<option>Family Level I</option>
-									<option>Family Level II</option>
-									<option>Family Level III</option>
+									<option>Level 1 Single</option>
+									<option>Level 2 Single</option>
+									<option>Level 3 Single</option>
+									<option>Level 1 Family</option>
+									<option>Level 2 Family</option>
+									<option>Level 3 Family</option>
 								</select>
 							</div>
 						</div>
@@ -2085,7 +2108,7 @@
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="DCPStatus" class="btn btn-default " type="checkbox" name="DCPStatus"></input>
+							<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" name="DCPStatus"></input>
 							<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md cadField">DCP</label>
 						</div>
 					</div>
@@ -2094,13 +2117,16 @@
 						<div class='col-xs-5'>
 							<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="DCPPlanNo" type="text" class="cadField" name="DCPPlanNo"></input>
+								<select id="DCPPlanNo" type="text" class="cadField" name="DCPPlanNo">
+								<option> 55555 </option>
+								<option> 55556 </option>
+								</select>
 							</div>
 						</div>
 						<div class='col-xs-5'>
 							<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
 							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="CertificateNumber" type="text" class="cadField" name="CertificateNumber"></input>
+								<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo"></input>
 							</div>
 						</div>
 					</div>

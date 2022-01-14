@@ -757,9 +757,12 @@
 	' Populate Fields based on CAD
 	Sub PopulateScreenCADFields()
 		Set employeeRecord = GetCADData(0)
+		
 		Set listOfInputs = document.getElementsByTagName("input")
+		Set listOfSelects = document.getElementsByTagName("select")
+
 		For Each inputField In listOfInputs
-			If inputField.className = "cadField" Then
+			If InStr(inputField.className, "cadField") Then
 				fieldName = inputField.name
 				If employeeRecord.Exists(fieldName) Then
 					If inputField.type = "checkbox" Then
@@ -771,6 +774,15 @@
 					Else
 						inputField.value = employeeRecord(fieldName)
 					End If
+				End If
+			End If
+		Next
+
+		For Each selectField In listOfSelects
+			If InStr(selectField.className, "cadField") Then
+				fieldName = selectField.name
+				If employeeRecord.Exists(fieldName) Then
+					selectField.value = employeeRecord(fieldName)
 				End If
 			End If
 		Next
@@ -1117,6 +1129,8 @@
 
 		' Effective Date or default to Nov 15
 		tempResult = SimpleFindRowUsingFilter(sheetJOB, "A2", employeeId, 2, 9, "JOB", 10, true)
+
+		MsgBox("test")
 
 		tempResult = validateAndFormatDate(tempResult)
 		If tempResult <> "" Then
@@ -1714,10 +1728,10 @@
 		' Validate EffectiveDate
 		Set targetElement = document.getElementById("EffectiveDate")
 		If validateAndFormatDate(targetElement.value) = "" Then
-			targetElement.parentElement.className = "form-field form-field-error"
+			targetElement.parentElement.className = "col-xs-6 form-field form-field-error"
 			ToggleWordGenerateButtons(false)
 		Else
-			targetElement.parentElement.className = "form-field"
+			targetElement.parentElement.className = "col-xs-6 form-field"
 			ToggleWordGenerateButtons(true)
 		End If
 
@@ -1951,7 +1965,7 @@
 					</div>
 
 					<div class="col-xs-5">
-						<button class="btn btn-default btn-lg pull-right"><img src="assets/img/reload.png" id="page3-reloadbutton"> Reset to default</button>
+						<button class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields()"><img src="assets/img/reload.png" id="page3-reloadbutton"> Reset to default</button>
 					</div>
 
 					<span class="col-xs-12 mrgn-bttm-lg"></span>
@@ -1968,7 +1982,7 @@
 
 					<div class="col-xs-6 form-field">
 						<label id="EffectiveDateLabel" for="Date">Effective Date</label>
-						<input id="EffectiveDate" type="text" class="cadField" placeholder="DD/MM/YYYY" name="EffectiveDate">
+						<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate">
 					</div>
 
 					<div class="col-xs-6 form-field">
@@ -1998,7 +2012,7 @@
 					</div>
 
 					<div class="col-xs-5">
-						<button class="btn btn-default btn-lg pull-right"><img src="assets/img/reload.png"> Reset to default</button>
+						<button class="btn btn-default btn-lg pull-right" id="reload-cad" title="Reload" onClick="PopulateScreenCADFields()"><img src="assets/img/reload.png" > Reset to default</button>
 					</div>
 
 					<span class="col-xs-12 mrgn-bttm-lg"></span>
@@ -2011,21 +2025,21 @@
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="PensionandDSB" class="btn btn-default " type="checkbox" name="PensionandDSB"></input>
+							<input id="PensionandDSB" class="btn btn-default cadField" type="checkbox" name="PensionandDSB"></input>
 							<label id="PensionandDSBLabel" for="Pension" class="mrgn-lft-md">Pension and Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="DisabilityInsurance" class="btn btn-default " type="checkbox" name="DisabilityInsurance"></input>
+							<input id="DisabilityInsurance" class="btn btn-default cadField" type="checkbox" name="DisabilityInsurance"></input>
 							<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="PSMIP" class="btn btn-default " type="checkbox" name="PSMIP"></input>
+							<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP"></input>
 							<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
 						</div>
 					</div>
@@ -2041,7 +2055,7 @@
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="PSHCP" class="btn btn-default " type="checkbox" name="PSHCP"></input>
+							<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP"></input>
 							<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
 						</div>
 					</div>
@@ -2072,7 +2086,7 @@
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
 							<input id="DCPStatus" class="btn btn-default " type="checkbox" name="DCPStatus"></input>
-							<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md">DCP</label>
+							<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md cadField">DCP</label>
 						</div>
 					</div>
 
@@ -2093,21 +2107,21 @@
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="UnionInsurance" class="btn btn-default " type="checkbox" name="UnionInsurance"></input>
-							<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md">Union Insurance</label>
+							<input id="UnionInsurance" class="btn btn-default cadField" type="checkbox" name="UnionInsurance"></input>
+							<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md ">Union Insurance</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="BilingualBonus" class="btn btn-default " type="checkbox" name="BilingualBonus"></input>
+							<input id="BilingualBonus" class="btn btn-default cadField" type="checkbox" name="BilingualBonus"></input>
 							<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-0">
 						<div class="form-checkbox pull-left">
-							<input id="AnnualandSickLeave" class="btn btn-default " type="checkbox" name="AnnualandSickLeave"></input>
+							<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave"></input>
 							<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
 						</div>
 					</div>
@@ -2123,84 +2137,84 @@
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="CompensatoryLeave" class="btn btn-default " type="checkbox" name="CompensatoryLeave"></input>
+							<input id="CompensatoryLeave" class="btn btn-default cadField" type="checkbox" name="CompensatoryLeave"></input>
 							<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="PayRevision" class="btn btn-default " type="checkbox" name="PayRevision"></input>
+							<input id="PayRevision" class="btn btn-default cadField" type="checkbox" name="PayRevision"></input>
 							<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="ContinuousService" class="btn btn-default " type="checkbox" name="ContinuousService"></input>
+							<input id="ContinuousService" class="btn btn-default cadField" type="checkbox" name="ContinuousService"></input>
 							<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="TermEmployment" class="btn btn-default " type="checkbox" name="TermEmployment"></input>
+							<input id="TermEmployment" class="btn btn-default cadField" type="checkbox" name="TermEmployment"></input>
 							<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="UnionDues" class="btn btn-default " type="checkbox" name="UnionDues"></input>
+							<input id="UnionDues" class="btn btn-default cadField" type="checkbox" name="UnionDues"></input>
 							<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="RA" class="btn btn-default " type="checkbox" name="RA"></input>
+							<input id="RA" class="btn btn-default cadField" type="checkbox" name="RA"></input>
 							<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="CreditUnion" class="btn btn-default " type="checkbox" name="CreditUnion"></input>
+							<input id="CreditUnion" class="btn btn-default cadField" type="checkbox" name="CreditUnion"></input>
 							<label id="CreditUnionLabel" for=" CreditUnion" class="mrgn-lft-md">Credit Union</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="GCWCC" class="btn btn-default " type="checkbox" name="GCWCC"></input>
+							<input id="GCWCC" class="btn btn-default cadField" type="checkbox" name="GCWCC"></input>
 							<label id="GCWCCLabel" for="GCWCC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="Garnishments" class="btn btn-default " type="checkbox" name="Garnishments"></input>
+							<input id="Garnishments" class="btn btn-default cadField" type="checkbox" name="Garnishments"></input>
 							<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="StudentLoans" class="btn btn-default " type="checkbox" name="StudentLoans"></input>
+							<input id="StudentLoans" class="btn btn-default cadField" type="checkbox" name="StudentLoans"></input>
 							<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="LIA" class="btn btn-default " type="checkbox" name="LIA"></input>
+							<input id="LIA" class="btn btn-default cadField" type="checkbox" name="LIA"></input>
 							<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
 						</div>
 					</div>
 
 					<div class="col-xs-12 mrgn-bttm-md">
 						<div class="form-checkbox pull-left">
-							<input id="Selffunded" class="btn btn-default " type="checkbox" name="Selffunded"></input>
+							<input id="Selffunded" class="btn btn-default cadField" type="checkbox" name="Selffunded"></input>
 							<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
 						</div>
 					</div>
@@ -2248,9 +2262,6 @@
 				<button class="actionButton" id="page5ButtonNext" onClick="GoToPage(1,event)">Generate next letter</button>
 			</div>
 		</div>
-
-
-
 	</div>
 	<div id="progress-overlay">
 		<img src="assets/img/spinner.gif" alt="In progress" />

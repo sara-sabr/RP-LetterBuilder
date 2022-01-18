@@ -501,12 +501,12 @@
 	I18N.Add "applicationTitle", 		Array("Letter Builder", "Générateur de lettres")
 	I18N.Add "pageTitle", 				Array("Letter Builder", "Générateur de lettres")
 	I18N.Add "page1Subtitle",   		Array("Are the files installed correctly?", "Les fichiers sont-ils installés correctement ?")
-	I18N.Add "page1Header",     		Array("What letter would you like to work on?", "###What letter would you like to work on?###")
-	I18N.Add "page1LetterType",     	Array("Letter Type", "###Letter Type###")
-	I18N.Add "page1LanguageSelect",     Array("Language of Letter", "###Language of Letter###")
+	I18N.Add "page1Header",     		Array("What letter would you like to work on?", "Sur quelle lettre aimeriez-vous travailler?")
+	I18N.Add "page1LetterType",     	Array("Letter Type", "Type de lettre")
+	I18N.Add "page1LanguageSelect",     Array("Language of Letter", "Langue de la lettre")
 	I18N.Add "page1OptionEnglish",      Array("English", "Anglais")
 	I18N.Add "page1OptionFrench",       Array("French", "Français")
-	I18N.Add "page1EffectiveDate",     	Array("Effective Date of Pay Action", "###Effective Date of Pay Action###")
+	I18N.Add "page1EffectiveDate",     	Array("Effective Date of Pay Action (dd/mm/yyyy)", "Date d’effet de l'action de paye (jj/mm/aaaa)")
 	I18N.Add "page1ButtonStart",     	Array("Lets get started", "Débuter")
 	I18N.Add "page1CadFileLabel",    	Array("CAD", "TBAC")
 	I18N.Add "page1CadFileErrorMsg",   	Array("Missing <span id=""fileCadName""></span> in folder.", "<span id=""fileCadName""></span> est manquant dans le dossier.")
@@ -673,6 +673,22 @@
 		End If
 	End Sub
 
+	' Reset all objects at the start
+	Sub ResetData()
+		If Not(IsEmpty(cadDict)) Then
+			cadDict.RemoveAll
+		End If
+		If Not(IsEmpty(employeeRecord)) Then
+			employeeRecord.RemoveAll
+		End If
+		configurationSettings.RemoveAll
+		attachmentsEN.Clear
+		attachmentsFR.Clear
+		
+		document.getElementById("inputEffectiveDate").value = ""
+		document.getElementById("cad-form").reset()
+	End Sub
+
 	' Close CAD
 	Sub CloseCAD()
 		excelWorkbook.Close(0)
@@ -685,7 +701,6 @@
 	Sub CheckAvailableModules()
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		Dim fileSuffix, languageCode, moduleName, propertyFile, selectElement, optionElement
-		modulesAvailable.RemoveAll
 		languageCode = document.getElementById("html").lang
 		Set selectElement = document.getElementById("selectLetter")
 		If languageCode = "fr" Then
@@ -694,24 +709,27 @@
 			fileSuffix = MOD_SUFFIX_EN
 		End If
 
-		For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
-			For Each file in objFolder.Files
-	
-				' Grab all files that end with -EN.docx and -FR.docx in all the template folders
-				If instr(file.name, fileSuffix) <> 0 Then
-				
-				moduleName = Replace(file.name, fileSuffix, "")
-				ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
-				propertyFile = file.Path
+		If selectElement.length = 0 Then
+			For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
+				For Each file in objFolder.Files
+		
+					' Grab all files that end with -EN.docx and -FR.docx in all the template folders
+					If instr(file.name, fileSuffix) <> 0 Then
+					
+					moduleName = Replace(file.name, fileSuffix, "")
+					ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
+					propertyFile = file.Path
+					End If
+				Next
+				If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
+					modulesAvailable.Add moduleName, propertyFile
+					Set optionElement = document.createElement("option")
+					optionElement.text = moduleName
+					selectElement.Add optionElement
 				End If
 			Next
-			If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
-				modulesAvailable.Add moduleName, propertyFile
-				Set optionElement = document.createElement("option")
-				optionElement.text = moduleName
-				selectElement.Add optionElement
-			End If
-		Next
+		End If
+		Set fso = Nothing
 	End Sub
 
 	' Verify installation is good.
@@ -1001,9 +1019,6 @@
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		Dim moduleLocation, moduleProperties
 		moduleProperties = modulesAvailable(moduleName)
-		attachmentsEN.Clear
-		attachmentsFR.Clear
-		configurationSettings.RemoveAll
 		LoadConfig(configFile)
 		LoadConfig(moduleProperties)
 		moduleLocation = Replace(moduleProperties, "\" & MOD_CONFIG, "")
@@ -1050,6 +1065,8 @@
 			End If
 		Loop
 		fileHandler.Close
+		Set fso = Nothing
+		Set fileHandler = Nothing
 	End Function
 
 	' Get the standard file name. You must call this only after creating employeeRecord
@@ -1809,6 +1826,7 @@
 			Case 6
 				window.setTimeOut "GoToPage6", 1000, "VBScript"
 			Case Else
+				ResetData()
 				window.setTimeOut "GoToPage1", 0, "VBScript"
 		End Select
 
@@ -1936,6 +1954,7 @@
 					<span class="pageIndicatorCircle pageIndicatorCircle-3"></span>
 					<span class="pageIndicatorCircle pageIndicatorCircle-4"></span>
 					<span class="pageIndicatorCircle pageIndicatorCircle-5"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-6"></span>
 				</div>
 			</div>
 		</div>
@@ -2064,7 +2083,7 @@
 			</div>
 
 			<div class="pageContent col-xs-12">
-				<form class="cad-form" onchange="validateForm()">
+				<form id="cad-form" class="cad-form" onchange="validateForm()">
 
 					<span class="col-xs-12 mrgn-tp-lg"></span>
 

@@ -564,6 +564,9 @@
 	I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
 	I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 	I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
+	I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
+	I18N.Add "PSHCPLevel2",				Array("Level 2", "Niveau 2")
+	I18N.Add "PSHCPLevel3", 			Array("Level 3", "Niveau 3")
 '	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
 '	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
 	I18N.Add "page3-reloadbutton",		Array("Reset to default", "Réinitialiser")
@@ -1914,7 +1917,7 @@
 
 			<!-- Title -->
 			<div>
-				<h1 id="pageTitle">Letter Builder</h1> V1.7
+				<h1 id="pageTitle">Letter Builder</h1> V2.0
 				<!-- Version String -->
 				<div id="pageIndicator">
 					<span class="pageIndicatorCircle pageIndicatorCircle-1"></span>
@@ -2165,9 +2168,9 @@
 								<p id="PSHCPLevelLabel" class="hidden" style="display: none;"></p>
 								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
 									<select id="PSHCPLevel" name="PSHCPLevel" class="cadField">
-										<option value="1"> Level 1 </option>
-										<option value="2"> Level 2 </option>
-										<option value="3"> Level 3 </option>
+										<option value="1" id="PSHCPLevel1"> Level 1 </option>
+										<option value="2" id="PSHCPLevel2"> Level 2 </option>
+										<option value="3" id="PSHCPLevel3"> Level 3 </option>
 									</select>
 								</div>
 							</div>

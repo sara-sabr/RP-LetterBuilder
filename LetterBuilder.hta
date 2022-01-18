@@ -1198,6 +1198,7 @@
 		GetCADDataBilingualBonus index, cadDict, employeeId
 		GetCADDataOtherBenefits index, cadDict, employeeId
 		GetCADDataLIA index, cadDict, employeeId
+		GetCadDataParental index, cadDict, employeeId
 
 		Set sheetCad = Nothing
 		Set sheetJOB = Nothing
@@ -1470,6 +1471,48 @@
 		tempResult = SimpleFindRowUsingFilter(sheetDED, "A2", employeeId, 2, 18, Array("5H*","5I*"), 18, false)
 		cadDict.Add "ServiceBuyback", tempResult <> ""
 		Set sheetDED = Nothing
+	End Function
+
+	' Get Parental Leave from CAD
+	Function GetCadDataParental(index, cadDict, employeeId)
+		' Sheets
+		Dim sheetJOB
+		Set sheetJOB = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		' LIA: Job Column I Code PLA on checks from the last business year
+		Dim dateExpression, typeExpression, RFLExpression
+
+		' Check if code PLA
+		Set typeExpression = New SearchExpression
+		typeExpression.ColumnIndex = 8
+		typeExpression.FilterExpression = "PLA"
+
+		' Check if within 1 year
+		Set dateExpression = New SearchExpression
+		dateExpression.ColumnIndex = 10
+		Dim today, oneYearAgo
+		'Don't use date format strings as Excel seems to convert dd/mm/yyyy to mm/dd/yyyy
+		today = date()
+		oneYearAgo = DateAdd("yyyy",-1,date())
+		dateExpression.BetweenExpressionA = ">=" & CDbl(oneYearAgo)
+		dateExpression.BetweenExpressionB = "<=" & CDbl(today)
+
+		Dim expressionArray
+		expressionArray = Array(typeExpression, dateExpression)
+		tempResult = FindRowUsingFilter(sheetJOB, "A2", employeeId, 2, expressionArray, 9, true)
+
+		If tempResult <> "" Then
+			Dim Parental
+			Parental = CStr(tempResult)
+
+			If Parental = "R" Then
+				cadDict.Add "Parental", "1"
+			Else
+				cadDict.Add "Parental", ""
+			End If
+		End If
+
+		Set sheetERN = Nothing
 	End Function
 
 	' Get Employee Info from CAD

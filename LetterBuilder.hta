@@ -561,6 +561,8 @@
 	I18N.Add "StudentLoansLabel",		Array("Student Loans", "Prêt étudiant")
 	I18N.Add "LIALabel",				Array("LIA", "CER")
 	I18N.Add "SelffundedLabel",			Array("Self funded", "Retenues pour congé autofinancé")
+	I18N.Add "ParentalLabel",			Array("Parental Leave ", "Fin du congé de maternité/parental ")
+	I18N.Add "GradualLabel",			Array("Gradual Return to Work ", "Retour progressif au travail ")
 '	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
 '	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
 	I18N.Add "page3-reloadbutton",		Array("Reset to default", "Réinitialiser")
@@ -684,8 +686,10 @@
 
 		For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
 			For Each file in objFolder.Files
+	
 				' Grab all files that end with -EN.docx and -FR.docx in all the template folders
 				If instr(file.name, fileSuffix) <> 0 Then
+				
 				moduleName = Replace(file.name, fileSuffix, "")
 				ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
 				propertyFile = file.Path
@@ -755,37 +759,61 @@
 	End Sub
 
 	' Populate Fields based on CAD
-	Sub PopulateScreenCADFields()
+	' FLAGS [
+	' 0: Populate only checkbox inputs
+	' 1: Populate entire Form
+	']
+	Sub PopulateScreenCADFields(flag)
 		Set employeeRecord = GetCADData(0)
-		
-		Set listOfInputs = document.getElementsByTagName("input")
-		Set listOfSelects = document.getElementsByTagName("select")
 
-		For Each inputField In listOfInputs
-			If InStr(inputField.className, "cadField") Then
-				fieldName = inputField.name
-				If employeeRecord.Exists(fieldName) Then
-					If inputField.type = "checkbox" Then
-						If employeeRecord(fieldName) <> "" Then
+		Set employeeTextInputs = document.getElementById("cad-text-inputs")
+		Set employeeCheckedInputs = document.getElementById("cad-checked-inputs")
+
+		If flag = 1 Then
+			UpdateFieldsInElement employeeTextInputs, employeeRecord
+		End If
+			UpdateFieldsInElement employeeCheckedInputs, employeeRecord
+
+		employeeTextInputs.style.display = "inline"
+		employeeCheckedInputs.style.display = "inline"
+	End Sub
+
+	Sub UpdateFieldsInElement(element, employeeRecord)
+		For Each inputField In element.getElementsByClassName("cadField")
+			fieldName = inputField.name
+			If employeeRecord.Exists(fieldName) Then
+				tagName = inputField.tagName
+				Select Case  tagName
+					Case "INPUT"
+						If inputField.type = "text" Then
+							inputField.value = employeeRecord(fieldName)
+						ElseIf inputField.type = "checkbox" Then
+							If employeeRecord(fieldName) <> "" Then
 							inputField.checked = true
-						Else
+							Else
 							inputField.checked = false
-						End If
-					Else
-						inputField.value = employeeRecord(fieldName)
-					End If
-				End If
-			End If
-		Next
+							End If
 
-		For Each selectField In listOfSelects
-			If InStr(selectField.className, "cadField") Then
-				fieldName = selectField.name
-				If employeeRecord.Exists(fieldName) Then
-					selectField.value = employeeRecord(fieldName)
-				End If
+							If inputField.hasAttribute("childField") Then
+								ShowCadField inputField.getAttribute("childField"), inputField.checked
+							End If
+						End If
+					Case "SELECT"
+						inputField.value = employeeRecord(fieldName)
+				End Select
 			End If
 		Next
+	End Sub
+
+	Sub ShowCadField(element, visible)
+		Set field = document.getElementById(element)
+
+
+		If visible Then
+			field.style.display = "block"
+		Else	
+			field.style.display = "none"
+		End If
 	End Sub
 
 	' Set document language
@@ -1151,7 +1179,6 @@
 
 		' Effective Date or default to Nov 15
 		tempResult = SimpleFindRowUsingFilter(sheetJOB, "A2", employeeId, 2, 9, "JOB", 10, true)
-
 
 		tempResult = validateAndFormatDate(tempResult)
 		If tempResult <> "" Then
@@ -1787,7 +1814,7 @@
 	End Function
 
 	Function GoToPage4()
-		PopulateScreenCADFields()
+		PopulateScreenCADFields(1)
 		validateForm()
 		ShowProgressOverlay(False)
 	End Function
@@ -1842,7 +1869,7 @@
 			</div>
 
 			<!-- Title -->
-			<div id="pageHeader col-xs-4">
+			<div>
 				<h1 id="pageTitle">Letter Builder</h1> V1.7
 				<!-- Version String -->
 				<div id="pageIndicator">
@@ -1908,7 +1935,7 @@
 							</span>
 							<span id="page1CadFileLabel" class="validationStatusLabel">CAD file</span>
 							<span class="validationStatusErrorMessage" id="page1CadFileErrorMsg">
-								Missing "<span id="fileCadName"></span>" in folder.</span>
+								Missing "<span id="fileCadName"></span>" in folder.
 							</span>
 						</li>
 						<li>
@@ -1920,7 +1947,7 @@
 							</span>
 							<span id="page1EnLtrLabel" class="validationStatusLabel">English Letter Template</span>
 							<span class="validationStatusErrorMessage" id="page1EnLtrErrorMsg">
-								Missing "<span id="fileEnLetterName"></span>" in folder.</span>
+								Missing "<span id="fileEnLetterName"></span>" in folder.
 							</span>
 						</li>
 						<li>
@@ -1932,7 +1959,7 @@
 							</span>
 							<span id="page1FrLtrLabel" class="validationStatusLabel">French Letter Template</span>
 							<span class="validationStatusErrorMessage" id="page1FrLtrErrorMsg">
-								Missing "<span id="fileFrLetterName"></span>" in folder.</span>
+								Missing "<span id="fileFrLetterName"></span>" in folder.
 							</span>
 						</li>
 					</ul>
@@ -1972,7 +1999,7 @@
 		</div>
 
 		<!-- RFL Page 4 -->
-		<div id="page-4" date-pageNo="4" class="page">
+		<div id="page-4" data-pageNo="4" class="page">
 
 			<div class="col-xs-12">
 				<h3 class="text-grey" id="page3Subtitle">Verify Information</h3>
@@ -1988,44 +2015,47 @@
 					</div>
 
 					<div class="col-xs-5">
-						<button class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields()"><img src="assets/img/reload.png" id="page3-reloadbutton"> Reset to default</button>
+						<button class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button"><img src="assets/img/reload.png" id="page3-reloadbutton" alt="Reload"> Reset to default</button>
 					</div>
 
-					<span class="col-xs-12 mrgn-bttm-lg"></span>
+					<div id="cad-text-inputs">
+						<span class="col-xs-12 mrgn-bttm-lg"></span>
 
-					<div class="col-xs-6 form-field">
-						<label id="PayListLabel" for="PayList">Paylist</label>
-						<input id="PayList" type="text" class="cadField" placeholder="####" name="PayList">
-					</div>
 
-					<div class="col-xs-6 form-field">
-						<label id="PRILabel" for="PRI">PRI</label>
-						<input id="PRI" type="text" class="cadField" readonly name="PRI">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="PayListLabel" for="PayList">Paylist</label>
+							<input id="PayList" type="text" class="cadField" placeholder="####" name="PayList">
+						</div>
 
-					<div class="col-xs-6 form-field">
-						<label id="EffectiveDateLabel" for="Date">Effective Date</label>
-						<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="PRILabel" for="PRI">PRI</label>
+							<input id="PRI" type="text" class="cadField" readonly name="PRI">
+						</div>
 
-					<div class="col-xs-6 form-field">
-						<label id="CaseNumberLabel" for="CaseNumber">Case #</label>
-						<input id="CaseNumber" type="text" class="cadField" placeholder="######" name="CaseNumber">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="EffectiveDateLabel" for="EffectiveDate">Effective Date</label>
+							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate">
+						</div>
 
-					<div class="col-xs-12 form-field">
-						<label id="EENameLabel" for="EEName">Name</label>
-						<input id="EEName" type="text" class="cadField" readonly name="EmployeeName">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="CaseNumberLabel" for="CaseNumber">Case #</label>
+							<input id="CaseNumber" type="text" class="cadField" placeholder="######" name="CaseNumber">
+						</div>
 
-					<div class="col-xs-12 form-field">
-						<label id="PersonalEmailLabel" for=" Email">Personal Email (Employee)</label>
-						<input id="PersonalEmail" type="text" class="cadField" name="PersonalEmail">
-					</div>
+						<div class="col-xs-12 form-field">
+							<label id="EENameLabel" for="EEName">Name</label>
+							<input id="EEName" type="text" class="cadField" readonly name="EmployeeName">
+						</div>
 
-					<div class="col-xs-12 form-field">
-						<label id="ReasonLabel" for="Reason">Reason</label>
-						<input id="Reason" type="text" class="cadField" readonly name="Reason">
+						<div class="col-xs-12 form-field">
+							<label id="PersonalEmailLabel" for="PersonalEmail">Personal Email (Employee)</label>
+							<input id="PersonalEmail" type="text" class="cadField" name="PersonalEmail">
+						</div>
+
+						<div class="col-xs-12 form-field">
+							<label id="ReasonLabel" for="Reason">Reason</label>
+							<input id="Reason" type="text" class="cadField" readonly name="Reason">
+						</div>
 					</div>
 
 					<span class="col-xs-12 mrgn-tp-lg"></span>
@@ -2034,214 +2064,223 @@
 						<p class="text-large text-left" id="Page3InstructionsLabel">Letter Customizations:</p>
 					</div>
 
-					<div class="col-xs-5">
-						<button class="btn btn-default btn-lg pull-right" id="reload-cad" title="Reload" onClick="PopulateScreenCADFields()"><img src="assets/img/reload.png" > Reset to default</button>
-					</div>
 
-					<span class="col-xs-12 mrgn-bttm-lg"></span>
-
-					<span class="col-xs-12 text-large text-left mrgn-bttm-lg" id="Page3InstructionsText">
-						Content with checkmarks are loaded by default based on the information collected from the CAD.
-						Please review and select or unselect as needed. Selecting field will add to the generated letter,
-						unselected fields will not be displayed on the letter.
-					</span>
-
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="PensionandDSB" class="btn btn-default cadField" type="checkbox" name="PensionandDSB"></input>
-							<label id="PensionandDSBLabel" for="Pension" class="mrgn-lft-md">Pension and Insurance</label>
-						</div>
-					</div>
-
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="DisabilityInsurance" class="btn btn-default cadField" type="checkbox" name="DisabilityInsurance"></input>
-							<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
-						</div>
-					</div>
-
-					<div class="col-xs-12 mrgn-bttm-0">
-						<div class="form-checkbox pull-left">
-							<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP"></input>
-							<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
-						</div>
-					</div>
-
-					<div id="IANField" class="col-xs-11 checkbox-type-input">
+					<div id="cad-checked-inputs">
 						<div class="col-xs-5">
-							<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="IAN" type="text" class="cadField" name="PSMIPNo"></input>
+							<button class="btn btn-default btn-lg pull-right" id="reload-cad" title="Reload" onClick="PopulateScreenCADFields(0)" type="button"><img src="assets/img/reload.png" alt="Reload"> Reset to default</button>
+						</div>
+
+						<span class="col-xs-12 mrgn-bttm-lg"></span>
+
+						<span class="col-xs-12 text-large text-left mrgn-bttm-lg" id="Page3InstructionsText">
+							Content with checkmarks are loaded by default based on the information collected from the CAD.
+							Please review and select or unselect as needed. Selecting field will add to the generated letter,
+							unselected fields will not be displayed on the letter.
+						</span>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PensionandDSB" class="btn btn-default cadField" type="checkbox" name="PensionandDSB">
+								<label id="PensionandDSBLabel" for="PensionandDSB" class="mrgn-lft-md">Pension and Insurance</label>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-0">
-						<div class="form-checkbox pull-left">
-							<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP"></input>
-							<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
-						</div>
-					</div>
-
-					<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
-						<div class='col-xs-5'>
-							<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="PSHCPNo" type="text" class="cadField" name="PSHCPNo"></input>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="DisabilityInsurance" class="btn btn-default cadField" type="checkbox" name="DisabilityInsurance">
+								<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
 							</div>
 						</div>
-						<div class='col-xs-5'>
-							<div id="PSHCPLevelLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<select id="PSHCPLevel" type="text" class="cadField" name="PSHCPLevel">
-									<option>Select</option>
-									<option>Level 1 Single</option>
-									<option>Level 2 Single</option>
-									<option>Level 3 Single</option>
-									<option>Level 1 Family</option>
-									<option>Level 2 Family</option>
-									<option>Level 3 Family</option>
-								</select>
+
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP" childField="PSMIPField" onclick="ShowCadField('PSMIPField', event.target.checked)">
+								<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-0">
-						<div class="form-checkbox pull-left">
-							<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" name="DCPStatus"></input>
-							<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md cadField">DCP</label>
-						</div>
-					</div>
-
-					<div id="DCPField" class="col-xs-11 checkbox-type-input">
-						<div class='col-xs-5'>
-							<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<select id="DCPPlanNo" type="text" class="cadField" name="DCPPlanNo">
-								<option> 55555 </option>
-								<option> 55556 </option>
-								</select>
+						<div id="PSMIPField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="IAN" type="text" class="cadField" name="PSMIPNo">
+								</div>
 							</div>
 						</div>
-						<div class='col-xs-5'>
-							<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo"></input>
+
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP" childField="PSHCPField" onclick="ShowCadField('PSHCPField', event.target.checked)">
+								<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="UnionInsurance" class="btn btn-default cadField" type="checkbox" name="UnionInsurance"></input>
-							<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md ">Union Insurance</label>
-						</div>
-					</div>
-
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="BilingualBonus" class="btn btn-default cadField" type="checkbox" name="BilingualBonus"></input>
-							<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
-						</div>
-					</div>
-
-					<div class="col-xs-12 mrgn-bttm-0">
-						<div class="form-checkbox pull-left">
-							<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave"></input>
-							<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
-						</div>
-					</div>
-
-					<div id="AWWField" class="col-xs-11 checkbox-type-input">
-						<div class='col-xs-5'>
-							<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0" id="AWWLabel">AWW</div>
-							<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-								<input id="AWW" type="text" class="cadField" name="AWW"></input>
+						<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
+								<p id="PSHCPLevelLabel" class="hidden" style="display: none;"></p>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<select id="PSHCPLevel" name="PSHCPLevel" class="cadField">
+										<option value="1"> Level 1 </option>
+										<option value="2"> Level 2 </option>
+										<option value="3"> Level 3 </option>
+									</select>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="CompensatoryLeave" class="btn btn-default cadField" type="checkbox" name="CompensatoryLeave"></input>
-							<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" childField="DCPStatusField" name="DCPStatus" onclick="ShowCadField('DCPStatusField', event.target.checked)">
+								<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md">DCP</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="PayRevision" class="btn btn-default cadField" type="checkbox" name="PayRevision"></input>
-							<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
+						<div id="DCPStatusField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<select id="DCPPlanNo" name="DCPPlanNo" class="cadField">
+										<option value="55555"> 55555 </option>
+										<option value="55556"> 55556 </option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-xs-5">
+								<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo">
+								</div>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="ContinuousService" class="btn btn-default cadField" type="checkbox" name="ContinuousService"></input>
-							<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="UnionInsurance" class="btn btn-default cadField" type="checkbox" name="UnionInsurance">
+								<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md ">Union Insurance</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="TermEmployment" class="btn btn-default cadField" type="checkbox" name="TermEmployment"></input>
-							<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="BilingualBonus" class="btn btn-default cadField" type="checkbox" name="BilingualBonus">
+								<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="UnionDues" class="btn btn-default cadField" type="checkbox" name="UnionDues"></input>
-							<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave" childField="AnnualandSickLeaveField" onclick="ShowCadField('AnnualandSickLeaveField', event.target.checked)">
+								<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="RA" class="btn btn-default cadField" type="checkbox" name="RA"></input>
-							<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
+						<div id="AnnualandSickLeaveField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0" id="AWWLabel">AWW</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="AWW" type="text" class="cadField" name="AWW">
+								</div>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="CreditUnion" class="btn btn-default cadField" type="checkbox" name="CreditUnion"></input>
-							<label id="CreditUnionLabel" for=" CreditUnion" class="mrgn-lft-md">Credit Union</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="CompensatoryLeave" class="btn btn-default cadField" type="checkbox" name="CompensatoryLeave">
+								<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="GCWCC" class="btn btn-default cadField" type="checkbox" name="GCWCC"></input>
-							<label id="GCWCCLabel" for="GCWCC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PayRevision" class="btn btn-default cadField" type="checkbox" name="PayRevision">
+								<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="Garnishments" class="btn btn-default cadField" type="checkbox" name="Garnishments"></input>
-							<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="ContinuousService" class="btn btn-default cadField" type="checkbox" name="ContinuousService">
+								<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="StudentLoans" class="btn btn-default cadField" type="checkbox" name="StudentLoans"></input>
-							<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="TermEmployment" class="btn btn-default cadField" type="checkbox" name="TermEmployment">
+								<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="LIA" class="btn btn-default cadField" type="checkbox" name="LIA"></input>
-							<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="UnionDues" class="btn btn-default cadField" type="checkbox" name="UnionDues">
+								<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="col-xs-12 mrgn-bttm-md">
-						<div class="form-checkbox pull-left">
-							<input id="Selffunded" class="btn btn-default cadField" type="checkbox" name="Selffunded"></input>
-							<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="RA" class="btn btn-default cadField" type="checkbox" name="RA">
+								<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="CreditUnion" class="btn btn-default cadField" type="checkbox" name="CreditUnion">
+								<label id="CreditUnionLabel" for="CreditUnion" class="mrgn-lft-md">Credit Union</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="GCWCC" class="btn btn-default cadField" type="checkbox" name="GCWCC">
+								<label id="GCWCCLabel" for="GCWCC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Garnishments" class="btn btn-default cadField" type="checkbox" name="Garnishments">
+								<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="StudentLoans" class="btn btn-default cadField" type="checkbox" name="StudentLoans">
+								<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="LIA" class="btn btn-default cadField" type="checkbox" name="LIA">
+								<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Selffunded" class="btn btn-default cadField" type="checkbox" name="Selffunded">
+								<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Parental" class="btn btn-default cadField" type="checkbox" name="Parental">
+								<label id="ParentalLabel" for="Parental" class="mrgn-lft-md">Parental Leave</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Gradual" class="btn btn-default cadField" type="checkbox" name="Gradual">
+								<label id="GradualLabel" for="Gradual" class="mrgn-lft-md">Gradual Return to Work</label>
+							</div>
 						</div>
 					</div>
 				</form>

@@ -202,7 +202,7 @@
 		}
 
 		.text-grey {
-			color: #C4C4C4;
+			color: #8A8A8A;
 		}
 
 		.label-button-lrg {
@@ -501,6 +501,12 @@
 	I18N.Add "applicationTitle", 		Array("Letter Builder", "Générateur de lettres")
 	I18N.Add "pageTitle", 				Array("Letter Builder", "Générateur de lettres")
 	I18N.Add "page1Subtitle",   		Array("Are the files installed correctly?", "Les fichiers sont-ils installés correctement ?")
+	I18N.Add "page1Header",     		Array("What letter would you like to work on?", "Sur quelle lettre aimeriez-vous travailler?")
+	I18N.Add "page1LetterType",     	Array("Letter Type", "Type de lettre")
+	I18N.Add "page1LanguageSelect",     Array("Language of Letter", "Langue de la lettre")
+	I18N.Add "page1OptionEnglish",      Array("English", "Anglais")
+	I18N.Add "page1OptionFrench",       Array("French", "Français")
+	I18N.Add "page1EffectiveDate",     	Array("Effective Date of Pay Action (dd/mm/yyyy)", "Date d’effet de l'action de paye (jj/mm/aaaa)")
 	I18N.Add "page1ButtonStart",     	Array("Lets get started", "Débuter")
 	I18N.Add "page1CadFileLabel",    	Array("CAD", "TBAC")
 	I18N.Add "page1CadFileErrorMsg",   	Array("Missing <span id=""fileCadName""></span> in folder.", "<span id=""fileCadName""></span> est manquant dans le dossier.")
@@ -575,7 +581,7 @@
 	I18N.Add "page4Subtitle",			Array("Review and Export", "Réviser et exporter")
 	I18N.Add "page4ButtonNext",			Array("Export to PDF", "Exporter en PDF")
 	I18N.Add "page4Instructions",	 	Array("The Letter generation is now complete. Please review content, before exporting to PDF", "Le processus est completé. Veuillez réviser le document avant d’exporter en PDF")
-	I18N.Add "page5Instructions",	 	Array("Successfully exported letter to PDF. <br /><a href=""#"" onClick=""OpenPDFFile()""><span id=""pdfFileName"">Placeholder</span></a>", "Lettre exportée en PDF avec succès. <br /><a href=""#"" onClick=""OpenPDFFile()""><span id=""pdfFileName"">Placeholder</span></a>")
+	I18N.Add "page5Instructions",	 	Array("Successfully exported letter to PDF.", "Lettre exportée en PDF avec succès.")
 	I18N.Add "page5Subtitle",			Array("Ready to be sent to EPOST", "Prêt à être envoyé à Postel")
 	I18N.Add "page5Subnote1",			Array("An email template had been created and ready to be sent to EPOST GD Box.", "Un gabarit de courriel a été créé et est prêt à être envoyé par Postel.")
 	I18N.Add "page5Subnote2",			Array("Review the content of the email and send when ready.", "Révisez le contenu du courriel et procédez à l’expédition.")
@@ -667,6 +673,22 @@
 		End If
 	End Sub
 
+	' Reset all objects at the start
+	Sub ResetData()
+		If Not(IsEmpty(cadDict)) Then
+			cadDict.RemoveAll
+		End If
+		If Not(IsEmpty(employeeRecord)) Then
+			employeeRecord.RemoveAll
+		End If
+		configurationSettings.RemoveAll
+		attachmentsEN.Clear
+		attachmentsFR.Clear
+		
+		document.getElementById("inputEffectiveDate").value = ""
+		document.getElementById("cad-form").reset()
+	End Sub
+
 	' Close CAD
 	Sub CloseCAD()
 		excelWorkbook.Close(0)
@@ -679,7 +701,6 @@
 	Sub CheckAvailableModules()
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		Dim fileSuffix, languageCode, moduleName, propertyFile, selectElement, optionElement
-		modulesAvailable.RemoveAll
 		languageCode = document.getElementById("html").lang
 		Set selectElement = document.getElementById("selectLetter")
 		If languageCode = "fr" Then
@@ -688,24 +709,27 @@
 			fileSuffix = MOD_SUFFIX_EN
 		End If
 
-		For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
-			For Each file in objFolder.Files
-	
-				' Grab all files that end with -EN.docx and -FR.docx in all the template folders
-				If instr(file.name, fileSuffix) <> 0 Then
-				
-				moduleName = Replace(file.name, fileSuffix, "")
-				ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
-				propertyFile = file.Path
+		If selectElement.length = 0 Then
+			For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
+				For Each file in objFolder.Files
+		
+					' Grab all files that end with -EN.docx and -FR.docx in all the template folders
+					If instr(file.name, fileSuffix) <> 0 Then
+					
+					moduleName = Replace(file.name, fileSuffix, "")
+					ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
+					propertyFile = file.Path
+					End If
+				Next
+				If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
+					modulesAvailable.Add moduleName, propertyFile
+					Set optionElement = document.createElement("option")
+					optionElement.text = moduleName
+					selectElement.Add optionElement
 				End If
 			Next
-			If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
-				modulesAvailable.Add moduleName, propertyFile
-				Set optionElement = document.createElement("option")
-				optionElement.text = moduleName
-				selectElement.Add optionElement
-			End If
-		Next
+		End If
+		Set fso = Nothing
 	End Sub
 
 	' Verify installation is good.
@@ -825,7 +849,7 @@
 		Dim docLang
 		docLang = document.getElementById("selectLanguage").value
 
-		If docLang = "French" Then
+		If docLang = "French" OR docLang = "Français" Then
 			documentLanguage = Array("Français", "French")
 		Else 
 			documentLanguage = Array("Anglais", "English")
@@ -843,12 +867,16 @@
 	End Sub
 
 	' Adds in the slashes while typing in the effective Date
-	Sub EffectiveDateFormatting()
+	Sub EffectiveDateFormatting(dateInput)
 		Dim currentDate
-		Set currentDate = document.getElementById("inputEffectiveDate")
+		Set currentDate = document.getElementById(dateInput)
 		If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
 			tempDate = currentDate.value & "/"
 			currentDate.value = tempDate
+		End If
+
+		If Len(currentDate.value) > 10 Then
+			currentDate.value = Mid(currentDate.value, 1, Len(currentDate.value) -1) 
 		End If
 	End Sub
 
@@ -982,14 +1010,15 @@
 		GetEffectiveDate = document.getElementById("inputEffectiveDate").value
 	End Function
 
+	Function GetEffectiveDateUserInput()
+		GetEffectiveDateUserInput = document.getElementById("EffectiveDate").value
+	End Function
+
 	' Load module information
 	Function LoadSelectedModule(moduleName)
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		Dim moduleLocation, moduleProperties
 		moduleProperties = modulesAvailable(moduleName)
-		attachmentsEN.Clear
-		attachmentsFR.Clear
-		configurationSettings.RemoveAll
 		LoadConfig(configFile)
 		LoadConfig(moduleProperties)
 		moduleLocation = Replace(moduleProperties, "\" & MOD_CONFIG, "")
@@ -1036,26 +1065,25 @@
 			End If
 		Loop
 		fileHandler.Close
+		Set fso = Nothing
+		Set fileHandler = Nothing
 	End Function
 
 	' Get the standard file name. You must call this only after creating employeeRecord
 	Function GetFileNameToUse()
 		Dim dayPortion, monthPortion
-		dayPortion = Day(Date)
-		monthPortion = Month(Date)
+		'dayPortion = Day(GetEffectiveDate())
+		'monthPortion = Month(GetEffectiveDate())
 
-		If dayPortion < 10 Then
-			dayPortion = "0" & dayPortion
-		End IF
+		effectiveDate = GetEffectiveDateUserInput()
 
-		If monthPortion <  10 Then
-			monthPortion = "0" & monthPortion
-		End If
+		employeeRecord("EffectiveDate") = GetEffectiveDateUserInput()
+		effectiveDate = Replace(effectiveDate, "/", "")
 		
 		If documentLanguage(1) = "French" Then
-			GetFileNameToUse = dayPortion & monthPortion & Year(Date) & configurationSettings("prefix.fr") & employeeRecord("EmployeeName")
+			GetFileNameToUse = effectiveDate & configurationSettings("prefix.fr") & employeeRecord("EmployeeName")
 		Else
-			GetFileNameToUse = dayPortion & monthPortion & Year(Date) & configurationSettings("prefix.en") & employeeRecord("EmployeeName")
+			GetFileNameToUse = effectiveDate & configurationSettings("prefix.en") & employeeRecord("EmployeeName")
 		End IF
 
 	End Function
@@ -1798,6 +1826,7 @@
 			Case 6
 				window.setTimeOut "GoToPage6", 1000, "VBScript"
 			Case Else
+				ResetData()
 				window.setTimeOut "GoToPage1", 0, "VBScript"
 		End Select
 
@@ -1925,6 +1954,7 @@
 					<span class="pageIndicatorCircle pageIndicatorCircle-3"></span>
 					<span class="pageIndicatorCircle pageIndicatorCircle-4"></span>
 					<span class="pageIndicatorCircle pageIndicatorCircle-5"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-6"></span>
 				</div>
 			</div>
 		</div>
@@ -1937,33 +1967,33 @@
 		<div id="page-1" data-pageNo="1" class="page">
 			<div class="pageContent col-xs-12">
 
-				<h2 class="col-xs-8 col-xs-offset-2 text-grey">What letter would you like to work on?</h2>
+				<h2 class="col-xs-8 col-xs-offset-2 text-grey" id="page1Header">What letter would you like to work on?</h2>
 
 				<span class=" col-xs-12 mrgn-tp-xl"></span>
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
-					<label for="selectLetter">Letter Type</label>
+					<label for="selectLetter" id="page1LetterType">Letter Type</label>
 
 					<select id="selectLetter" class="cadField" name="selectLetter">
 					</select>
 				</div>
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
-					<label>Language of Letter</label>
+					<label id="page1LanguageSelect">Language of Letter</label>
 					<select id="selectLanguage" class="cadField" name="selectLanguage">
-						<option>English</option>
-						<option>French</option>
+						<option id="page1OptionEnglish">English</option>
+						<option id="page1OptionFrench">French</option>
 					</select>
 				</div>
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
-					<label for="inputEffectiveDate">Effective Date of Pay Action</label>
-					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" onkeyup="EffectiveDateFormatting()">
+					<label id="page1EffectiveDate" for="inputEffectiveDate">Effective Date of Pay Action</label>
+					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" onkeyup="EffectiveDateFormatting('inputEffectiveDate')">
 				</div>
 			</div>
 
 			<div class="actionBar col-xs-12">
-				<button class="actionButton" id="page1ButtonGenerateEn" onClick="GoToPage(2,event)">Lets Get Started</button>
+				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(2,event)">Lets Get Started</button>
 			</div>
 		</div>
 
@@ -2053,7 +2083,7 @@
 			</div>
 
 			<div class="pageContent col-xs-12">
-				<form class="cad-form" onchange="validateForm()">
+				<form id="cad-form" class="cad-form" onchange="validateForm()">
 
 					<span class="col-xs-12 mrgn-tp-lg"></span>
 
@@ -2081,7 +2111,7 @@
 
 						<div class="col-xs-6 form-field">
 							<label id="EffectiveDateLabel" for="EffectiveDate">Effective Date</label>
-							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate">
+							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate" onkeyup="EffectiveDateFormatting('EffectiveDate')">
 						</div>
 
 						<div class="col-xs-6 form-field">
@@ -2368,8 +2398,9 @@
 					<img src="assets/img/completed.png" alt="Completed" /><br />
 					<p id="page5Instructions">
 						Successfully exported letter to PDF. <br />
-						<a href="#" onClick="OpenPDFFile()"><span id="pdfFileName">Placeholder</span></a>
 					</p>
+						<a href="#" onClick="OpenPDFFile()"><span id="pdfFileName">Placeholder</span></a>
+					
 					<ul id="page5Subnotes" class="subnotes">
 						<li id="page5Subnote1">An email template had been created and ready to be sent to EPOST GD Box.</li>
 						<li id="page5Subnote2">Review the content of the email and send when ready.</li>

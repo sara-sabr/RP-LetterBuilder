@@ -1,444 +1,468 @@
 <!DOCTYPE HTML>
 <html lang="en" dir="ltr" id="html">
+
 <head>
-<title id="applicationTitle">Letter Builder</title>
-<HTA:APPLICATION id="LetterBuilder"
-				 BORDER="thin"
-				 BORDERSTYLE="normal"
-				 maximizeButton="yes"
-				 minimizeButton="yes"
-				 SINGLEINSTANCE="yes"
-				 SCROLLFLAT="flat"
-				 ICON="assets/favicon.ico"
-				 />
-<meta charset="UTF-8">
-<meta http-equiv="x-ua-compatible" content="ie=9">
+	<title id="applicationTitle">Letter Builder</title>
+	<HTA:APPLICATION id="LetterBuilder" BORDER="thin" BORDERSTYLE="normal" maximizeButton="yes" minimizeButton="yes" SINGLEINSTANCE="yes" SCROLLFLAT="flat" ICON="assets/favicon.ico" />
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=9">
 
-<!-- Include WET styles https://wet-boew.github.io/wet-boew-styleguide/index-en.html -->
-<link href="src/styles/ie8-theme.css" rel="stylesheet">
+	<!-- Include WET styles https://wet-boew.github.io/wet-boew-styleguide/index-en.html -->
+	<link href="src/styles/ie8-theme.css" rel="stylesheet">
 
-<!-- Do Windows Move right away -->
-<SCRIPT type="text/vbscript" language="vbscript">
-	window.focus()
-	window.resizeTo (screen.AvailWidth/2), screen.AvailHeight
-	window.moveTo 0, 0
-</SCRIPT>
+	<!-- Do Windows Move right away -->
+	<SCRIPT type="text/vbscript" language="vbscript">
+		window.focus()
+		window.resizeTo (screen.AvailWidth/2), screen.AvailHeight
+		window.moveTo 0, 0
+	</SCRIPT>
 
-<style>
-	.hidden {
-		display: none;
-	}
-	.sr-only {
-		position:absolute;
-		left:-10000px;
-		top:auto;
-		width:1px;
-		height:1px;
-		overflow:hidden;
-	}
+	<style>
+		.hidden {
+			display: none;
+		}
 
-	html, body {
-		font-family: Helvetica, Arial, sans-serif;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-		margin: 0 auto;
-		background-color: #F2F2F2;
-	}
+		.sr-only {
+			position: absolute;
+			left: -10000px;
+			top: auto;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+		}
 
-	div.main {
-		padding-right: 32px;
-		padding-left: 32px;
-		padding-top: 32px;
-		width: 586px;
-		height: 95%;
-		margin: 0 auto;
-		text-align: center;
-		background-color: white;
-	}
+		html,
+		body {
+			font-family: Helvetica, Arial, sans-serif;
+			width: 100%;
+			height: 100vh;
+			overflow: hidden;
+			margin: 0 auto;
+			background-color: #F2F2F2;
+		}
 
-	div.banner {
-		width: 100%;
-		vertical-align: middle;
-		height: 57px;
-		background-color: white;
-	}
+		div.main {
+			padding-top: 32px;
+			width: 650px;
+			height: 100%;
+			margin: 0 auto;
+			text-align: center;
+			background-color: white;
+		}
 
-	/* FIP image (ESDC) */
-	div.banner > img.fip {
-		padding-top: 5px;
-		width: 502px;
-		height: 46px;
-		vertical-align: bottom;
-	}
+		div.banner {
+			width: 100%;
+			vertical-align: middle;
+			height: 57px;
+			background-color: white;
+		}
 
-	div#languageToggleSection {
-		text-align: right;
-	}
+		/* FIP image (ESDC) */
+		div.banner>img.fip {
+			padding-top: 5px;
+			width: 502px;
+			height: 46px;
+			vertical-align: bottom;
+		}
 
-	div#languageToggleSection > a:hover {
-		text-decoration: underline;
-	}
+		div#languageToggleSection {
+			text-align: right;
+		}
 
-	/** Hide Toggle depending on current language*/
-	html[lang="fr"] a#languageFrench {
-		display:none;
-	}
+		div#languageToggleSection>a:hover {
+			text-decoration: underline;
+		}
 
-	html[lang="en"] a#languageEnglish {
-		display:none;
-	}
+		/** Hide Toggle depending on current language*/
+		html[lang="fr"] a#languageFrench {
+			display: none;
+		}
 
-	div#progress-overlay {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		left: 0;
-		top:0;
-		background: rgba(6, 6, 6, 0.6);
-		z-index: 9;
-		vertical-align: middle;
-	}
+		html[lang="en"] a#languageEnglish {
+			display: none;
+		}
 
-	div#progress-overlay > img {
-		padding-left: 377px;
-		padding-top: 415px;
-	}
+		div#progress-overlay {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			left: 0;
+			top: 0;
+			background: rgba(6, 6, 6, 0.6);
+			z-index: 9;
+			vertical-align: middle;
+		}
 
-	/** Page */
-	div.page {
-		height: 100%;
-		display: none;
-	}
+		div#progress-overlay>img {
+			padding-left: 377px;
+			padding-top: 415px;
+		}
 
-	body.page-1 #page-1,
-	body.page-2 #page-2,
-	body.page-3 #page-3,
-	body.page-4 #page-4,
-	body.page-5 #page-5,
-	body.page-6 #page-6 {
-		display: inherit;
-	}
+		/** Page */
+		div.page {
+			height: 100%;
+			display: none;
+		}
 
-	div.pageContent {
-		height: calc(100% - 310px);
-		overflow-y: auto;
-	}
+		body.page-1 #page-1,
+		body.page-2 #page-2,
+		body.page-3 #page-3,
+		body.page-4 #page-4,
+		body.page-5 #page-5,
+		body.page-6 #page-6 {
+			display: inherit;
+		}
 
-	#page-3 > div.pageContent {
-		height: calc(100% - 362px);
-		overflow-y: auto;
-	}
+		div.pageContent {
+			height: calc(100% - 289px);
+			overflow-y: auto;
+		}
 
-	ul#page2Subnotes {
-		padding-top: 32px;
-		width: 445px;
-		margin: 0 auto;
-		text-align: left;
-		font-size: 18px;
-		line-height: 21px;
-	}
+		ul#page2Subnotes {
+			padding-top: 32px;
+			width: 445px;
+			margin: 0 auto;
+			text-align: left;
+			font-size: 18px;
+			line-height: 21px;
+		}
 
-	ul#page5Subnotes {
-		padding-top: 32px;
-		width: 363px;
-		margin: 0 auto;
-		text-align: left;
-		font-size: 18px;
-		line-height: 21px;
-	}
+		ul#page5Subnotes {
+			padding-top: 32px;
+			width: 363px;
+			margin: 0 auto;
+			text-align: left;
+			font-size: 18px;
+			line-height: 21px;
+		}
 
-	span#page2ContentP1{
-		font-size: 18px;
-		position: relative;
-		left: -55px;
-	}
+		span#page2ContentP1 {
+			font-size: 18px;
+			position: relative;
+			left: -55px;
+		}
 
-	p#page5Instructions{
-		font-size: 18px;
-	}
+		p#page5Instructions {
+			font-size: 18px;
+		}
 
 
-	ul.subnotes > li {
-		padding-bottom: 21px;
-	}
+		ul.subnotes>li {
+			padding-bottom: 21px;
+		}
 
-	div.pageMiddle {
-		display: table;
-		width: 100%;
-	}
+		div.pageMiddle {
+			display: table;
+			width: 100%;
+		}
 
-	div.pageMiddleContent {
-		vertical-align: middle;
-  	  	display: table-cell;
-	}
+		div.pageMiddleContent {
+			vertical-align: middle;
+			display: table-cell;
+		}
 
-	div#pageHeader {
-		width: 100%;
-		text-align: center;
-	}
+		div#pageHeader {
+			width: 100%;
+			text-align: center;
+		}
 
-	p.pageSubTitle {
-		color: #8A8A8A;
-		width: 394px;
-		height: 25px;
-		font-weight: bold;
-		font-size: 24px;
-		text-align: center;
-		line-height: 28px;
-		padding-top: 30px;
-		margin: 0 auto;
-	}
+		p.pageSubTitle {
+			color: #8A8A8A;
+			width: 394px;
+			height: 25px;
+			font-weight: bold;
+			font-size: 24px;
+			text-align: center;
+			line-height: 28px;
+			padding-top: 128px;
+			margin: 0 auto;
+		}
 
-	h1#pageTitle {
-		display: inline;
-		padding: 5px;
-		margin: 0;
-	}
+		h1#pageTitle {
+			display: inline;
+			padding: 5px;
+			margin: 0;
+		}
 
-	div#pageIndicator {
-		width: 150px;
-		height: 10px;
-		margin: 0 auto;
-		text-align: center;
-	}
+		div#pageIndicator {
+			width: 150px;
+			height: 10px;
+			margin: 0 auto;
+			text-align: center;
+		}
 
-	.pageIndicatorCircle:before {
-		content: ' \25CF';
-		color: #C4C4C4;
-		vertical-align: top;
-	}
+		.pageIndicatorCircle:before {
+			content: ' \25CF';
+			color: #C4C4C4;
+			vertical-align: top;
+		}
 
-	body.page-1 span.pageIndicatorCircle-1:before,
-	body.page-2 span.pageIndicatorCircle-1:before,
-	body.page-2 span.pageIndicatorCircle-2:before,
-	body.page-3 span.pageIndicatorCircle-1:before,
-	body.page-3 span.pageIndicatorCircle-2:before,
-	body.page-3 span.pageIndicatorCircle-3:before,
-	body.page-4 span.pageIndicatorCircle-1:before,
-	body.page-4 span.pageIndicatorCircle-2:before,
-	body.page-4 span.pageIndicatorCircle-3:before,
-	body.page-4 span.pageIndicatorCircle-4:before,
-	body.page-5 span.pageIndicatorCircle-1:before,
-	body.page-5 span.pageIndicatorCircle-2:before,
-	body.page-5 span.pageIndicatorCircle-3:before,
-	body.page-5 span.pageIndicatorCircle-4:before,
-	body.page-5 span.pageIndicatorCircle-5:before,
-	body.page-6 span.pageIndicatorCircle-1:before,
-	body.page-6 span.pageIndicatorCircle-2:before,
-	body.page-6 span.pageIndicatorCircle-3:before,
-	body.page-6 span.pageIndicatorCircle-4:before,
-	body.page-6 span.pageIndicatorCircle-5:before,
-	body.page-6 span.pageIndicatorCircle-6:before {
-		color: #4C71F4;
-	}
+		.text-large {
+			font-size: 18px;
+		}
 
-	/** Action Bar Buttons */
-	div.actionBar {
-		position: absolute;
-  		bottom: 0;
-		left: 0;
-		margin: 0 147px;
-		width: 650px;
-		padding-top: 32px;
-		box-shadow: 0px -5px 4px rgba(167, 167, 167, 0.15);
-		height: 89px;
-	}
+		.text-grey {
+			color: #C4C4C4;
+		}
 
-	button.actionButton {
-		padding: 12px 21px;
-		margin: auto 0;
-		min-width: 194px;
-		height: 58px;
-   	    border: 1px solid #26374A;
-		font-size: 22px;
-		background-color: #26374A;
-		color: white;
-		border-radius: 5px;
-		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
-	}
+		.label-button-lrg {
+			padding-top: 24px;
+		}
 
-	button.actionButton:disabled {
-		cursor: not-allowed;
-		opacity: 0.4;
-		background-color: #26374A !important;
-	}
+		.checkbox-type-input {
+			margin-left: 48px;
+			border-left: 2px rgba(167, 167, 167, 0.15) solid;
+			margin-top: 8px;
+			margin-bottom: 8px;
+			padding: 0;
+		}
 
-	button.actionButton:hover {
-		background-color: #1C578A;
-   	    border-color: #091C2D;
-	}
+		body.page-1 span.pageIndicatorCircle-1:before,
+		body.page-2 span.pageIndicatorCircle-1:before,
+		body.page-2 span.pageIndicatorCircle-2:before,
+		body.page-3 span.pageIndicatorCircle-1:before,
+		body.page-3 span.pageIndicatorCircle-2:before,
+		body.page-3 span.pageIndicatorCircle-3:before,
+		body.page-4 span.pageIndicatorCircle-1:before,
+		body.page-4 span.pageIndicatorCircle-2:before,
+		body.page-4 span.pageIndicatorCircle-3:before,
+		body.page-4 span.pageIndicatorCircle-4:before,
+		body.page-5 span.pageIndicatorCircle-1:before,
+		body.page-5 span.pageIndicatorCircle-2:before,
+		body.page-5 span.pageIndicatorCircle-3:before,
+		body.page-5 span.pageIndicatorCircle-4:before,
+		body.page-5 span.pageIndicatorCircle-5:before,
+		body.page-6 span.pageIndicatorCircle-1:before,
+		body.page-6 span.pageIndicatorCircle-2:before,
+		body.page-6 span.pageIndicatorCircle-3:before,
+		body.page-6 span.pageIndicatorCircle-4:before,
+		body.page-6 span.pageIndicatorCircle-5:before,
+		body.page-6 span.pageIndicatorCircle-6:before {
+			color: #4C71F4;
+		}
 
-	button.actionButton:active {
-		background-color: #16446C;
-   	    border-color: #000000;
-	}
+		/** Action Bar Buttons */
+		div.actionBar {
+			position: fixed;
+			bottom: 0;
+			margin: 0;
+			padding-top: 16px;
+			width: 650px;
+			box-shadow: 0px -5px 4px rgba(167, 167, 167, 0.15);
+			height: 89px;
+		}
 
-	div.page1-recheckButtonbar {
-		height: 50px;
-		margin: 0 147px;
-		width: 650px;
-		position: absolute;
-		bottom: 161px;
-		left: 0;
-	}
+		button.actionButton {
+			padding: 12px 21px;
+			margin: auto 0;
+			min-width: 194px;
+			height: 58px;
+			border: 1px solid #26374A;
+			font-size: 22px;
+			background-color: #26374A;
+			color: white;
+			border-radius: 5px;
+			box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+		}
 
-	button.secondaryButton {
-		min-width: 105px;
-		padding: 12px 21px;
-		height: 43px;
-		font-size: 16px;
-		background-color: #EAEBED;
-		border-color: #DCDEE1;
-		color: #335075;
-		border-radius: 5px;
-	}
+		button.actionButton:disabled {
+			cursor: not-allowed;
+			opacity: 0.4;
+			background-color: #26374A !important;
+		}
 
-	button.secondaryButton > img.button-icon {
-		vertical-align: top;
-		padding-right: 3px;
-		margin: 0;
-	}
+		button.actionButton:hover {
+			background-color: #1C578A;
+			border-color: #091C2D;
+		}
 
-	button.reloadCadButton {
-		position: absolute;
-		right: 0;
-		top: 15px;
-	}
+		button.actionButton:active {
+			background-color: #16446C;
+			border-color: #000000;
+		}
 
-	button.secondaryButton:hover {
-		background-color: #CFD1D5;
-   	    border-color: #091C2D;
-	}
+		div.page1-recheckButtonbar {
+			height: 50px;
+			margin: 0 147px;
+			width: 650px;
+			position: absolute;
+			bottom: 161px;
+			left: 0;
+		}
 
-	button.secondaryButton:active {
-		background-color: #BBBFC5;
-   	    border-color: #000000;
-	}
+		button.secondaryButton {
+			min-width: 105px;
+			padding: 12px 21px;
+			height: 43px;
+			font-size: 16px;
+			background-color: #EAEBED;
+			border-color: #DCDEE1;
+			color: #335075;
+			border-radius: 5px;
+		}
 
-	/** Validation - Page 1 */
+		button.secondaryButton>img.button-icon {
+			vertical-align: top;
+			padding-right: 3px;
+			margin: 0;
+		}
 
-	ul.validationEntries {
-		margin: 0 auto;
-		padding: 0;
-		width: 449px;
-		list-style-type:none;
-		font-style: normal;
-		font-weight: normal;
-		line-height: 28px;
-		color: #000000;
-	}
+		button.reloadCadButton {
+			position: absolute;
+			right: 0;
+			top: 15px;
+		}
 
-	ul.validationEntries > li {
-		padding-bottom: 60px;
-		padding-left: 55px;
-		font-size: 20px;
-		text-align: left;
-		position: relative;
-	}
+		button.secondaryButton:hover {
+			background-color: #CFD1D5;
+			border-color: #091C2D;
+		}
 
-	ul.validationEntries span.validationStatusIcon {
-		display: none;
-		position: absolute;
-		left: 0;
-		top: -5px;
-	}
+		button.secondaryButton:active {
+			background-color: #BBBFC5;
+			border-color: #000000;
+		}
 
-	ul.validationEntries span.validationStatusErrorMessage {
-		display: none;
-		position: absolute;
-	}
+		/** Validation - Page 1 */
 
-	span.validationStatusErrorMessage {
-		border-left: 3px solid red;
-		margin-top: 5px;
-		padding-left: 10px;
-		width: calc(100% - 60px);
-		font-size: 14px;
-		line-height: 16px;
-	}
+		ul.validationEntries {
+			margin: 0 auto;
+			padding: 0;
+			width: 449px;
+			list-style-type: none;
+			font-style: normal;
+			font-weight: normal;
+			line-height: 28px;
+			color: #000000;
+		}
 
-	div.form-field > span.validationStatusErrorMessage {
-		display: none;
-		text-align: left;
-		margin-left: 150px;
-		width: 70%;
-		padding-left: 5px;
-	}
+		ul.validationEntries>li {
+			padding-bottom: 60px;
+			padding-left: 55px;
+			font-size: 20px;
+			text-align: left;
+			position: relative;
+		}
 
-	div.form-field-error > span.validationStatusErrorMessage {
-		display: inherit;
-	}
+		ul.validationEntries span.validationStatusIcon {
+			display: none;
+			position: absolute;
+			left: 0;
+			top: -5px;
+		}
 
-	ul.validationEntries > li.success > span.validationStatusSuccess,
-	ul.validationEntries > li.error > span.validationStatusError,
-	ul.validationEntries > li.error > span.validationStatusErrorMessage {
-		display: block;
-	}
+		ul.validationEntries span.validationStatusErrorMessage {
+			display: none;
+			position: absolute;
+		}
 
-	/** Style the forms */
-	div.form-field {
-		width: 100%;
-		padding-bottom: 15px;
-	}
+		span.validationStatusErrorMessage {
+			border-left: 3px solid red;
+			margin-top: 5px;
+			padding-left: 10px;
+			width: calc(100% - 60px);
+			font-size: 14px;
+			line-height: 16px;
+		}
 
-	form.cad-form {
-		padding-bottom: 10px;
-	}
+		div.form-field>span.validationStatusErrorMessage {
+			display: none;
+			/* text-align: left;
+			margin-left: 150px;
+			width: 70%;
+			padding-left: 5px; */
+		}
 
-	div.form-field > input[type="checkbox"] {
-		display: inline-block;
-		width: 25px;
-		height: 25px;
-   	    vertical-align: middle;
-	}
+		div.form-field-error>span.validationStatusErrorMessage {
+			display: inherit;
+		}
 
-	/** Show Related field capability when checked */
-	div.form-field > input[type="checkbox"]:checked ~ div.form-field {
-		display: inherit;
-	}
+		ul.validationEntries>li.success>span.validationStatusSuccess,
+		ul.validationEntries>li.error>span.validationStatusError,
+		ul.validationEntries>li.error>span.validationStatusErrorMessage {
+			display: block;
+		}
 
-	/** Hide related fields capability */
-	div.form-field > input[type="checkbox"] ~ div.form-field {
-		display: none;
-	}
+		/** Style the forms */
+		div.form-field {
+			padding-bottom: 32px;
+		}
 
-	div.form-field > input[type="text"] {
-		display: inline-block;
-		width: 50%;
-		height: 25px;
-		font-size: 18px;
-		border: 1px solid #CACACA;
-		padding-left: 5px;
-		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
-	}
+		form.cad-form {
+			overflow-y: auto;
+		}
 
-	div.form-field > input[readonly] {
-		background-color: #EDEDED;
-	}
+		div.form-field>label {
+			width: 100%;
+		}
 
-	div.form-field > label {
-		display: inline-block;
-		width: 45%;
-		text-align: right;
-		font-size: 18px;
-	}
+		div.form-field>input[type="checkbox"] {
+			display: inline-block;
+			width: 25px;
+			height: 25px;
+			vertical-align: middle;
+		}
 
-	div.form-field-checkbox > label {
-		text-align: left;
-   	    vertical-align: baseline;
-		width: 90%;
-	}
+		/** Show Related field capability when checked */
+		div.form-field>input[type="checkbox"]:checked~div.form-field {
+			display: inherit;
+		}
 
-	p.instruction {
-		text-align: left;
-		width: 99%;
-		font-size: 18px;
-	}
+		/** Hide related fields capability */
+		div.form-field>input[type="checkbox"]~div.form-field {
+			display: none;
+		}
 
-</style>
+		div.form-field>input[type="text"] {
+			width: 100%;
+			height: 40px;
+			font-size: 20px;
+			border: 1px solid #CACACA;
+			padding: 2px 2px 2px 20px;
+			box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+		}
 
-<script type="text/vbscript">
+		div.form-field>select {
+			width: 100%;
+			height: 40px;
+			font-size: 20px;
+			border: 1px solid #CACACA;
+			padding: 2px 2px 2px 20px;
+			box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+		}
+
+		div.form-field>input[readonly] {
+			background-color: #EDEDED;
+		}
+
+		div.form-field>label {
+			width: 100%;
+			font-size: 16px;
+			font-weight: 700;
+			color: #7F7F7F;
+			float: left;
+			text-align: left;
+		}
+
+		div.form-checkbox>label {
+			font-size: 20px;
+			font-weight: 400;
+		}
+
+		div.form-field-checkbox>label {
+			text-align: left;
+			vertical-align: baseline;
+			width: 90%;
+		}
+
+		p.instruction {
+			text-align: left;
+			width: 99%;
+			font-size: 18px;
+		}
+	</style>
+
+	<script type="text/vbscript">
 	' User modifiable Constants
 	' =======================================
 	const FN_CAD = "CAD.xlsb"
@@ -484,10 +508,10 @@
 	I18N.Add "page1EnLtrErrorMsg",    	Array("Missing <span id=""fileEnLetterName""></span> in folder.", "<span id=""fileEnLetterName""></span> est manquant dans le dossier.")
 	I18N.Add "page1FrLtrLabel",    		Array("French Letter Template", "Gabarit Lettre - Français")
 	I18N.Add "page1FrLtrErrorMsg",    	Array("Missing  <span id=""fileFrLetterName""></span> in folder.", "<span id=""fileFrLetterName""></span> est manquant dans le dossier.")
-	I18N.Add "page1EnPSHCPOptLabel",    Array("English PSHCP Options Form", "Formulaire d’options RSSFP - Anglais")
-	I18N.Add "page1EnPSHCPOptErrorMsg", Array("Missing  <span id=""fileEnOptionsName""></span> in folder.", "<span id=""fileEnOptionsName""></span> est manquant dans le dossier.")
-	I18N.Add "page1FrPSHCPOptLabel",    Array("French PSHCP Options Form", "Formulaire d’options RSSFP - Français")
-	I18N.Add "page1FrPSHCPOptErrorMsg", Array("Missing  <span id=""fileFrOptionsName""></span> in folder.", "<span id=""fileFrOptionsName""></span> est manquant dans le dossier.")
+	' I18N.Add "page1EnPSHCPOptLabel",    Array("English PSHCP Options Form", "Formulaire d’options RSSFP - Anglais")
+	' I18N.Add "page1EnPSHCPOptErrorMsg", Array("Missing  <span id=""fileEnOptionsName""></span> in folder.", "<span id=""fileEnOptionsName""></span> est manquant dans le dossier.")
+	' I18N.Add "page1FrPSHCPOptLabel",    Array("French PSHCP Options Form", "Formulaire d’options RSSFP - Français")
+	' I18N.Add "page1FrPSHCPOptErrorMsg", Array("Missing  <span id=""fileFrOptionsName""></span> in folder.", "<span id=""fileFrOptionsName""></span> est manquant dans le dossier.")
 	I18N.Add "page1RetryButton",		Array("Retry", "Réessayer")
 	I18N.Add "page2Subtitle",			Array("Enter PRI in CAD", "Inscrire le CIDP dans le TBAC")
 	I18N.Add "page2ContentP1",			Array("The CAD Excel spreadsheet is now open.", "Le fichier excel TBAC est maintenant ouvert.")
@@ -501,12 +525,12 @@
 	I18N.Add "PayListLabel",			Array("Pay List", "Liste de paye")
 	I18N.Add "PRILabel",				Array("PRI", "CIDP")
 	I18N.Add "EENameLabel",				Array("Employee Name", "Nom de l'employé(e)")
-	I18N.Add "EEStreetLabel",			Array("Employee Address", "Adresse de l'employé(e)")
-	I18N.Add "EECityLabel",				Array("Employee City", "Ville de l'employé(e)")
-	I18N.Add "EEProvinceLabel",			Array("Employee Province", "Province de l'employé(e)")
-	I18N.Add "EEPostalCodeLabel",		Array("Employee Postal Code", "Code postale de l'employé(e)")
+	'I18N.Add "EEStreetLabel",			Array("Employee Address", "Adresse de l'employé(e)")
+	'I18N.Add "EECityLabel",				Array("Employee City", "Ville de l'employé(e)")
+	'I18N.Add "EEProvinceLabel",			Array("Employee Province", "Province de l'employé(e)")
+	'I18N.Add "EEPostalCodeLabel",		Array("Employee Postal Code", "Code postale de l'employé(e)")
 	I18N.Add "ReasonLabel",				Array("Reason", "Raison")
-	I18N.Add "EffectiveDateLabel",		Array("Effective Date (dd/mm/yyyy)", "Date d’effet (jj/mm/aaaa)")
+	I18N.Add "inputEffectiveDate",		Array("Effective Date of Pay Action (dd/mm/yyyy)", "Date d’effet de l'action de paye (jj/mm/aaaa)")
 	I18N.Add "PersonalEmailLabel",		Array("Personal Email", "Courriel personnel")
 	I18N.Add "CaseNumberLabel",			Array("Case Number", "Numéro de cas")
 	I18N.Add "Page3InstructionsLabel",	Array("Letter Customizations", "Personnalisation de la lettre")
@@ -518,7 +542,7 @@
 	I18N.Add "PSHCPLabel",				Array("PSHCP", "RSSFP")
 	I18N.Add "PSHCPNoLabel",			Array("PSHCP Number", "Numéro RSSFP")
 	I18N.Add "PSHCPLevelLabel",			Array("PSHCP Level", "Niveau RSSFP")
-	I18N.Add "DCPStatusLabel",			Array("DCP Status", "Statut RSD")
+	I18N.Add "DCPLabel",			Array("DCP Status", "Statut RSD")
 	I18N.Add "DCPPlanNoLabel",			Array("DCP Plan Number", "Numéro de régime RSD")
 	I18N.Add "CertificateNumberLabel",	Array("Certificate Number", "Numéro de certificat")
 	I18N.Add "UnionInsuranceLabel",		Array("Union Insurance", "Assurance syndicale")
@@ -537,11 +561,13 @@
 	I18N.Add "StudentLoansLabel",		Array("Student Loans", "Prêt étudiant")
 	I18N.Add "LIALabel",				Array("LIA", "CER")
 	I18N.Add "SelffundedLabel",			Array("Self funded", "Retenues pour congé autofinancé")
-	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
-	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
+	I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
+	I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
+	I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
+'	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
+'	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
 	I18N.Add "page3-reloadbutton",		Array("Reset to default", "Réinitialiser")
-	I18N.Add "page3ButtonGenerateEn", 	Array("Generate English Letter", "Générer lettre - Anglais")
-	I18N.Add "page3ButtonGenerateFr", 	Array("Generate French Letter", "Générer lettre - Français")
+	I18N.Add "page3ButtonGenerate", 	Array("Generate Letter", "Générer lettre")
 	I18N.Add "page3Instruction",	 	Array("Please verify employee information:", "Svp vérifier les informations de l’employé:")
 	I18N.Add "page4Subtitle",			Array("Review and Export", "Réviser et exporter")
 	I18N.Add "page4ButtonNext",			Array("Export to PDF", "Exporter en PDF")
@@ -649,8 +675,10 @@
 	'Check for available modules and add them to a list
 	Sub CheckAvailableModules()
 		Set fso = CreateObject("Scripting.FileSystemObject")
-		Dim fileSuffix, languageCode, moduleName, propertyFile
+		Dim fileSuffix, languageCode, moduleName, propertyFile, selectElement, optionElement
+		modulesAvailable.RemoveAll
 		languageCode = document.getElementById("html").lang
+		Set selectElement = document.getElementById("selectLetter")
 		If languageCode = "fr" Then
 			fileSuffix = MOD_SUFFIX_FR
 		Else
@@ -659,8 +687,10 @@
 
 		For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
 			For Each file in objFolder.Files
+	
 				' Grab all files that end with -EN.docx and -FR.docx in all the template folders
 				If instr(file.name, fileSuffix) <> 0 Then
+				
 				moduleName = Replace(file.name, fileSuffix, "")
 				ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
 				propertyFile = file.Path
@@ -668,14 +698,16 @@
 			Next
 			If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
 				modulesAvailable.Add moduleName, propertyFile
+				Set optionElement = document.createElement("option")
+				optionElement.text = moduleName
+				selectElement.Add optionElement
 			End If
 		Next
 	End Sub
 
 	' Verify installation is good.
 	Sub CheckInstall()
-		CheckAvailableModules()
-		LoadSelectedModule("LWOP Vaccine")
+		LoadSelectedModule(document.getElementById("selectLetter").value)
 		Call UpdateValidationStatusEntry("page1CadFileLabel", cadFile)
 		Call UpdateValidationStatusEntry("page1EnLtrLabel", letterEnFile)
 		Call UpdateValidationStatusEntry("page1FrLtrLabel", letterFrFile)
@@ -721,8 +753,6 @@
 		document.getElementById("fileCadName").innerText = FN_CAD
 		document.getElementById("fileEnLetterName").innerText = FN_ENGLISH_LETTER
 		document.getElementById("fileFrLetterName").innerText = FN_FRENCH_LETTER
-		document.getElementById("fileEnOptionsName").innerText = FN_ENGLISH_PSHCP_OPTIONS
-		document.getElementById("fileFrOptionsName").innerText = FN_FRENCH_PSHCP_OPTIONS
 
 		If Not e is Nothing Then
 			e.preventDefault()
@@ -730,38 +760,93 @@
 	End Sub
 
 	' Populate Fields based on CAD
-	Sub PopulateScreenCADFields()
+	' FLAGS [
+	' 0: Populate only checkbox inputs
+	' 1: Populate entire Form
+	']
+	Sub PopulateScreenCADFields(flag)
 		Set employeeRecord = GetCADData(0)
-		Set listOfInputs = document.getElementsByTagName("input")
-		For Each inputField In listOfInputs
-			If inputField.className = "cadField" Then
-				fieldName = inputField.name
-				If employeeRecord.Exists(fieldName) Then
-					If inputField.type = "checkbox" Then
-						If employeeRecord(fieldName) <> "" Then
+
+		Set employeeTextInputs = document.getElementById("cad-text-inputs")
+		Set employeeCheckedInputs = document.getElementById("cad-checked-inputs")
+
+		If flag = 1 Then
+			UpdateFieldsInElement employeeTextInputs, employeeRecord
+		End If
+			UpdateFieldsInElement employeeCheckedInputs, employeeRecord
+
+		employeeTextInputs.style.display = "inline"
+		employeeCheckedInputs.style.display = "inline"
+	End Sub
+
+	Sub UpdateFieldsInElement(element, employeeRecord)
+		For Each inputField In element.getElementsByClassName("cadField")
+			fieldName = inputField.name
+			If employeeRecord.Exists(fieldName) Then
+				tagName = inputField.tagName
+				Select Case  tagName
+					Case "INPUT"
+						If inputField.type = "text" Then
+							inputField.value = employeeRecord(fieldName)
+						ElseIf inputField.type = "checkbox" Then
+							If employeeRecord(fieldName) <> "" Then
 							inputField.checked = true
-						Else
+							Else
 							inputField.checked = false
+							End If
+
+							If inputField.hasAttribute("childField") Then
+								ShowCadField inputField.getAttribute("childField"), inputField.checked
+							End If
 						End If
-					Else
+					Case "SELECT"
 						inputField.value = employeeRecord(fieldName)
-					End If
-				End If
+				End Select
 			End If
 		Next
 	End Sub
 
+	Sub ShowCadField(element, visible)
+		Set field = document.getElementById(element)
 
+
+		If visible Then
+			field.style.display = "block"
+		Else	
+			field.style.display = "none"
+		End If
+	End Sub
+
+	' Set document language
+	Sub SetDocumentLanguage()
+		Dim docLang
+		docLang = document.getElementById("selectLanguage").value
+
+		If docLang = "French" Then
+			documentLanguage = Array("Français", "French")
+		Else 
+			documentLanguage = Array("Anglais", "English")
+		End If
+
+	End Sub
 	' Generate English Letter
 	Sub GenerateEnglishLetter()
-		documentLanguage = Array("Anglais", "English")
 		GenerateLetter(letterEnFile)
 	End Sub
 
 	' Generate French Letter
 	Sub GenerateFrenchLetter()
-		documentLanguage = Array("Français", "French")
 		GenerateLetter(letterFrFile)
+	End Sub
+
+	' Adds in the slashes while typing in the effective Date
+	Sub EffectiveDateFormatting()
+		Dim currentDate
+		Set currentDate = document.getElementById("inputEffectiveDate")
+		If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
+			tempDate = currentDate.value & "/"
+			currentDate.value = tempDate
+		End If
 	End Sub
 
 	' Generate Letter Helper
@@ -890,6 +975,10 @@
 		End If
 	End Function
 
+	Function GetEffectiveDate()
+		GetEffectiveDate = document.getElementById("inputEffectiveDate").value
+	End Function
+
 	' Load module information
 	Function LoadSelectedModule(moduleName)
 		Set fso = CreateObject("Scripting.FileSystemObject")
@@ -897,6 +986,8 @@
 		moduleProperties = modulesAvailable(moduleName)
 		attachmentsEN.Clear
 		attachmentsFR.Clear
+		configurationSettings.RemoveAll
+		LoadConfig(configFile)
 		LoadConfig(moduleProperties)
 		moduleLocation = Replace(moduleProperties, "\" & MOD_CONFIG, "")
 		Set objFolder = fso.GetFolder(moduleLocation)
@@ -923,7 +1014,6 @@
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		Set fileHandler = fso.OpenTextFile(filePath)
 		Dim line, keyValueDelimIdx, key, value
-
 		Do Until fileHandler.AtEndOfStream
 			line = fileHandler.ReadLine
 			line = Trim(line)
@@ -979,8 +1069,9 @@
 	' Populate Fields based on Manual Input
 	Function PopulateFieldsManualInput()
 		Set listOfInputs = document.getElementsByTagName("input")
+		Set listOfSelects = document.getElementsByTagName("select")
 		For Each inputField in listOfInputs
-			If inputField.className = "cadField" Then
+			If InStr(inputField.className, "cadField") Then
 				fieldName = inputField.name
 				If inputField.type = "checkbox" Then
 					If inputField.checked = true Then
@@ -994,9 +1085,16 @@
 			End If
 		Next
 
+		For Each selectField in listOfSelects
+			If InStr(selectField.className, "cadField") Then
+				fieldName = selectField.name
+				employeeRecord(fieldName) = selectField.value
+			End If
+		Next
+
 		' check if the PSHCP level is 1 or 2/3 and set the status in the employee record
 		If employeeRecord("PSHCP") = "1" Then
-			If employeeRecord("PSHCPLevel") = "1" Then
+			If instr(employeeRecord("PSHCPLevel"), "1") Then
 				employeeRecord("PSHCPLevel1") = "1"
 				employeeRecord("PSHCPLevel2Or3") = ""
 			Else
@@ -1018,7 +1116,7 @@
 		If tempResult <> "" Then
 			employeeRecord("EffectiveDate") = tempResult
 		Else
-			employeeRecord("EffectiveDate") = "15/11/2021"
+			employeeRecord("EffectiveDate") = GetEffectiveDate()
 		End If
 
 		Set PopulateFieldsManualInput = employeeRecord
@@ -1087,7 +1185,7 @@
 		If tempResult <> "" Then
 			cadDict.Add "EffectiveDate", tempResult
 		Else
-			cadDict.Add "EffectiveDate", "15/11/2021"
+			cadDict.Add "EffectiveDate", GetEffectiveDate()
 		End If
 
 		' Get Data Helpers
@@ -1100,6 +1198,7 @@
 		GetCADDataBilingualBonus index, cadDict, employeeId
 		GetCADDataOtherBenefits index, cadDict, employeeId
 		GetCADDataLIA index, cadDict, employeeId
+		GetCadDataParental index, cadDict, employeeId
 
 		Set sheetCad = Nothing
 		Set sheetJOB = Nothing
@@ -1181,8 +1280,10 @@
 		If IsNumeric(tempResult) Then
 			tempResult = FormatNumber(Round(tempResult * 2.0, 2), 2)
 			cadDict.Add "AWW", tempResult
+			cadDict.Add "AnnualandSickLeave", "1"
 		Else
 			cadDict.Add "AWW", 0
+			cadDict.Add "AnnualandSickLeave", ""
 		End If
 
 		' Get Status of Union Deductions
@@ -1370,6 +1471,48 @@
 		tempResult = SimpleFindRowUsingFilter(sheetDED, "A2", employeeId, 2, 18, Array("5H*","5I*"), 18, false)
 		cadDict.Add "ServiceBuyback", tempResult <> ""
 		Set sheetDED = Nothing
+	End Function
+
+	' Get Parental Leave from CAD
+	Function GetCadDataParental(index, cadDict, employeeId)
+		' Sheets
+		Dim sheetJOB
+		Set sheetJOB = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		' LIA: Job Column I Code PLA on checks from the last business year
+		Dim dateExpression, typeExpression, RFLExpression
+
+		' Check if code PLA
+		Set typeExpression = New SearchExpression
+		typeExpression.ColumnIndex = 8
+		typeExpression.FilterExpression = "PLA"
+
+		' Check if within 1 year
+		Set dateExpression = New SearchExpression
+		dateExpression.ColumnIndex = 10
+		Dim today, oneYearAgo
+		'Don't use date format strings as Excel seems to convert dd/mm/yyyy to mm/dd/yyyy
+		today = date()
+		oneYearAgo = DateAdd("yyyy",-1,date())
+		dateExpression.BetweenExpressionA = ">=" & CDbl(oneYearAgo)
+		dateExpression.BetweenExpressionB = "<=" & CDbl(today)
+
+		Dim expressionArray
+		expressionArray = Array(typeExpression, dateExpression)
+		tempResult = FindRowUsingFilter(sheetJOB, "A2", employeeId, 2, expressionArray, 9, true)
+
+		If tempResult <> "" Then
+			Dim Parental
+			Parental = CStr(tempResult)
+
+			If Parental = "R" Then
+				cadDict.Add "Parental", "1"
+			Else
+				cadDict.Add "Parental", ""
+			End If
+		End If
+
+		Set sheetERN = Nothing
 	End Function
 
 	' Get Employee Info from CAD
@@ -1567,8 +1710,7 @@
 
 	' Enable or disable the word document generation
 	Function ToggleWordGenerateButtons(isEnabled)
-		document.getElementById("page3ButtonGenerateEn").Disabled = Not(isEnabled)
-		document.getElementById("page3ButtonGenerateFr").Disabled = Not(isEnabled)
+		document.getElementById("page3ButtonGenerate").Disabled = Not(isEnabled)
 	End Function
 
 	Function EmailSubjectLine()
@@ -1647,11 +1789,7 @@
 			Case 3
 				window.setTimeOut "GoToPage3", 1000, "VBScript"
 			Case 4
-				If e.target.id = "page3ButtonGenerateEn" Then
-					window.setTimeOut "GoToPage4English", 1000, "VBScript"
-				Else
-					window.setTimeOut "GoToPage4French", 1000, "VBScript"
-				End If
+				window.setTimeOut "GoToPage4", 1000, "VBScript"
 			Case 5
 				window.setTimeOut "GoToPage5", 1000, "VBScript"
 			Case 6
@@ -1684,10 +1822,10 @@
 		' Validate EffectiveDate
 		Set targetElement = document.getElementById("EffectiveDate")
 		If validateAndFormatDate(targetElement.value) = "" Then
-			targetElement.parentElement.className = "form-field form-field-error"
+			targetElement.parentElement.className = "col-xs-6 form-field form-field-error"
 			ToggleWordGenerateButtons(false)
 		Else
-			targetElement.parentElement.className = "form-field"
+			targetElement.parentElement.className = "col-xs-6 form-field"
 			ToggleWordGenerateButtons(true)
 		End If
 
@@ -1704,39 +1842,44 @@
 	End Function
 
 	Function GoToPage1()
-		CheckInstall
+		CheckAvailableModules()
 		ShowProgressOverlay(False)
 	End Function
 
 	Function GoToPage2()
-		OpenCAD()
+		SetDocumentLanguage()
+		CheckInstall
 		ShowProgressOverlay(False)
 	End Function
 
 	Function GoToPage3()
-		PopulateScreenCADFields()
+		OpenCAD()
+		ShowProgressOverlay(False)
+	End Function
+
+	Function GoToPage4()
+		PopulateScreenCADFields(1)
 		validateForm()
 		ShowProgressOverlay(False)
 	End Function
 
-	Function GoToPage4English()
-		GenerateEnglishLetter()
-		ShowProgressOverlay(False)
-	End Function
-
-	Function GoToPage4French()
-		GenerateFrenchLetter()
-		ShowProgressOverlay(False)
-	End Function
-
 	Function GoToPage5()
+		If documentLanguage(1) = "English" Then
+			GenerateEnglishLetter()
+		Else
+			GenerateFrenchLetter()
+		End If
+		ShowProgressOverlay(False)
+	End Function
+
+	Function GoToPage6()
 		CreatePDF()
 		document.getElementById("pdfFileName").innerText = pdfFileName
 		SendEmail()
 		ShowProgressOverlay(False)
 	End Function
 
-	Function GoToPage6()
+	Function GoToPage7()
 		ShowProgressOverlay(False)
 	End Function
 
@@ -1753,6 +1896,7 @@
 </script>
 
 </head>
+
 <body>
 	<div class="banner">
 		<img src="assets/img/fip-en.png" alt="Logo of ESDC" class="fip" id="fip" />
@@ -1760,21 +1904,25 @@
 
 	<!-- Main Body -->
 	<div class="main" id="main">
-		<!-- Language Switch -->
-		<div id="languageToggleSection">
-			<a href="#" id="languageEnglish" onClick="TranslateScreen('en', event)">English</a>
-			<a href="#" id="languageFrench" onClick="TranslateScreen('fr', event)">Français</a>
-		</div>
 
-		<!-- Title -->
-		<div id="pageHeader">
-			<h1 id="pageTitle">Letter Builder</h1> V1.7 <!-- Version String -->
-			<div id="pageIndicator">
-				<span class="pageIndicatorCircle pageIndicatorCircle-1"></span>
-				<span class="pageIndicatorCircle pageIndicatorCircle-2"></span>
-				<span class="pageIndicatorCircle pageIndicatorCircle-3"></span>
-				<span class="pageIndicatorCircle pageIndicatorCircle-4"></span>
-				<span class="pageIndicatorCircle pageIndicatorCircle-5"></span>
+		<div class="col-xs-12">
+			<!-- Language Switch -->
+			<div id="languageToggleSection" class="col-xs-8 col-xs-offset-4">
+				<a href="#" id="languageEnglish" onClick="TranslateScreen('en', event)">English</a>
+				<a href="#" id="languageFrench" onClick="TranslateScreen('fr', event)">Français</a>
+			</div>
+
+			<!-- Title -->
+			<div>
+				<h1 id="pageTitle">Letter Builder</h1> V1.7
+				<!-- Version String -->
+				<div id="pageIndicator">
+					<span class="pageIndicatorCircle pageIndicatorCircle-1"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-2"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-3"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-4"></span>
+					<span class="pageIndicatorCircle pageIndicatorCircle-5"></span>
+				</div>
 			</div>
 		</div>
 
@@ -1782,70 +1930,80 @@
 		      Pages now starting
 		     ========================================= -->
 
-		<!-- Page 1 -->
+		<!-- RFL Letter Select Page 1 -->
 		<div id="page-1" data-pageNo="1" class="page">
+			<div class="pageContent col-xs-12">
+
+				<h2 class="col-xs-8 col-xs-offset-2 text-grey">What letter would you like to work on?</h2>
+
+				<span class=" col-xs-12 mrgn-tp-xl"></span>
+
+				<div class="col-xs-8 col-xs-offset-2 form-field">
+					<label for="selectLetter">Letter Type</label>
+
+					<select id="selectLetter" class="cadField" name="selectLetter">
+					</select>
+				</div>
+
+				<div class="col-xs-8 col-xs-offset-2 form-field">
+					<label>Language of Letter</label>
+					<select id="selectLanguage" class="cadField" name="selectLanguage">
+						<option>English</option>
+						<option>French</option>
+					</select>
+				</div>
+
+				<div class="col-xs-8 col-xs-offset-2 form-field">
+					<label for="inputEffectiveDate">Effective Date of Pay Action</label>
+					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" onkeyup="EffectiveDateFormatting()">
+				</div>
+			</div>
+
+			<div class="actionBar col-xs-12">
+				<button class="actionButton" id="page1ButtonGenerateEn" onClick="GoToPage(2,event)">Lets Get Started</button>
+			</div>
+		</div>
+
+		<!-- RFL Page 2 -->
+		<div id="page-2" data-pageNo="2" class="page">
 			<p class="pageSubTitle" id="page1Subtitle">Are the files installed correctly?</p>
-			<div class="pageContent pageMiddle">
+			<div class="pageContent pageMiddle col-xs-12">
 				<div class="pageMiddleContent">
 					<ul class="validationEntries">
 						<li>
 							<span class="validationStatusIcon validationStatusSuccess">
-								<img src="assets/img/checkbox.png" alt="Pass"/>
+								<img src="assets/img/checkbox.png" alt="Pass" />
 							</span>
 							<span class="validationStatusIcon validationStatusError">
-								<img src="assets/img/error.png" alt="Failed"/>
+								<img src="assets/img/error.png" alt="Failed" />
 							</span>
 							<span id="page1CadFileLabel" class="validationStatusLabel">CAD file</span>
 							<span class="validationStatusErrorMessage" id="page1CadFileErrorMsg">
-								Missing "<span id="fileCadName"></span>" in folder.</span>
+								Missing "<span id="fileCadName"></span>" in folder.
 							</span>
 						</li>
 						<li>
 							<span class="validationStatusIcon validationStatusSuccess">
-								<img src="assets/img/checkbox.png" alt="Pass"/>
+								<img src="assets/img/checkbox.png" alt="Pass" />
 							</span>
 							<span class="validationStatusIcon validationStatusError">
-								<img src="assets/img/error.png" alt="Failed"/>
+								<img src="assets/img/error.png" alt="Failed" />
 							</span>
 							<span id="page1EnLtrLabel" class="validationStatusLabel">English Letter Template</span>
 							<span class="validationStatusErrorMessage" id="page1EnLtrErrorMsg">
-								Missing "<span id="fileEnLetterName"></span>" in folder.</span>
+								Missing "<span id="fileEnLetterName"></span>" in folder.
 							</span>
 						</li>
 						<li>
 							<span class="validationStatusIcon validationStatusSuccess">
-								<img src="assets/img/checkbox.png" alt="Pass"/>
+								<img src="assets/img/checkbox.png" alt="Pass" />
 							</span>
 							<span class="validationStatusIcon validationStatusError">
-								<img src="assets/img/error.png" alt="Failed"/>
+								<img src="assets/img/error.png" alt="Failed" />
 							</span>
 							<span id="page1FrLtrLabel" class="validationStatusLabel">French Letter Template</span>
 							<span class="validationStatusErrorMessage" id="page1FrLtrErrorMsg">
-								Missing  "<span id="fileFrLetterName"></span>" in folder.</span>
-							</span>
-						</li>
-						<li>
-							<span class="validationStatusIcon validationStatusSuccess">
-								<img src="assets/img/checkbox.png" alt="Pass"/>
-							</span>
-							<span class="validationStatusIcon validationStatusError">
-								<img src="assets/img/error.png" alt="Failed"/>
-							</span>
-							<span id="page1EnPSHCPOptLabel" class="validationStatusLabel">English PSHCP Options Form</span>
-							<span class="validationStatusErrorMessage" id="page1EnPSHCPOptErrorMsg">
-								Missing  "<span id="fileEnOptionsName"></span>" in folder.</span>
-							</span>
-						</li>
-						<li>
-							<span class="validationStatusIcon validationStatusSuccess">
-								<img src="assets/img/checkbox.png" alt="Pass"/>
-							</span>
-							<span class="validationStatusIcon validationStatusError">
-								<img src="assets/img/error.png" alt="Failed"/>
-							</span>
-							<span id="page1FrPSHCPOptLabel" class="validationStatusLabel">French PSHCP Options Form</span>
-							<span class="validationStatusErrorMessage" id="page1FrPSHCPOptErrorMsg">
-								Missing  "<span id="fileFrOptionsName"></span>" in folder.</span>
+								Missing "<span id="fileFrLetterName"></span>" in folder.
 							</span>
 						</li>
 					</ul>
@@ -1853,245 +2011,339 @@
 			</div>
 			<div class="page1-recheckButtonbar" id="recheck-install">
 				<button class="secondaryButton" onClick="CheckInstall()">
-					<img class="button-icon" src="assets/img/reload.png" alt="Reload"/>
+					<img class="button-icon" src="assets/img/reload.png" alt="Reload" />
 					<span id="page1RetryButton">
-					Retry
+						Retry
 					</span>
 				</button>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(2,event)">Lets get started</button>
+				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(3,event)">Lets get started</button>
 			</div>
 		</div>
 
-		<!-- Page 2 -->
-		<div id="page-2" data-pageNo="2" class="page">
+		<!-- RFL Page 3 -->
+		<div id="page-3" data-pageNo="3" class="page">
 			<p class="pageSubTitle" id="page2Subtitle">Enter PRI</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
 					<span id="page2ContentP1">The CAD Excel spread sheet is now open. </span>
 					<ul id="page2Subnotes" class="subnotes">
-					<li id="page2ContentL1"> Acknowledge the CAD disclaimer (<b>IF SHOWN</b>)</li>
-					<li id="page2ContentL2"> Please navigate to the "CAD" tab of the file and enter in a single PRI into cell B2.</li>
-					<li id="page2ContentL3"> Ensure the following codes on the CAD are checked DED, PER, JOB, ERN, BEN, and CAD </li>
-					<li id="page2ContentL4"> Press “Auto Load” on CAD to populate employee data </li>
-					<li id="page2ContentL5"> Once complete click next on this screen to continue</li>
+						<li id="page2ContentL1"> Acknowledge the CAD disclaimer (<b>IF SHOWN</b>)</li>
+						<li id="page2ContentL2"> Please navigate to the "CAD" tab of the file and enter in a single PRI into cell B2.</li>
+						<li id="page2ContentL3"> Ensure the following codes on the CAD are checked DED, PER, JOB, ERN, BEN, and CAD </li>
+						<li id="page2ContentL4"> Press “Auto Load” on CAD to populate employee data </li>
+						<li id="page2ContentL5"> Once complete click next on this screen to continue</li>
 					</ul>
 				</div>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page2ButtonNext" onClick="GoToPage(3,event)">Next</button>
+				<button class="actionButton" id="page2ButtonNext" onClick="GoToPage(4,event)">Next</button>
 			</div>
 		</div>
 
-		<!-- Page 3 -->
-		<div id="page-3" data-pageNo="3" class="page">
-			<p class="pageSubTitle" id="page3Subtitle">Verify Information</p>
-			<div style="position: relative; height: 40px;">
-				<br/>
-				<span id="page3Instruction" style="position:absolute; left: 0; top: 35px;"></span>
-				<button id="reload-cad" title="Reload" class="secondaryButton reloadCadButton" onClick="PopulateScreenCADFields()">
-					<img class="button-icon" src="assets/img/reload.png" alt="Reload"/>
-					<span id="page3-reloadbutton">Reset to default</span>
-				</button>
+		<!-- RFL Page 4 -->
+		<div id="page-4" data-pageNo="4" class="page">
+
+			<div class="col-xs-12">
+				<h3 class="text-grey" id="page3Subtitle">Verify Information</h3>
 			</div>
-			<br clear="all"/>
-			<br clear="all"/>
-			<div class="pageContent">
-			  	<form class="cad-form" onchange="validateForm()">
-					<div class="form-field">
-						<label for="PayList" id="PayListLabel">Pay List</label>
-						<input type="text" class="cadField" id="PayList" class="cadField" name="PayList">
+
+			<div class="pageContent col-xs-12">
+				<form class="cad-form" onchange="validateForm()">
+
+					<span class="col-xs-12 mrgn-tp-lg"></span>
+
+					<div class="col-xs-7 label-button-lrg">
+						<p class="text-large text-left" id="page3Instruction">Please verify employee information:</p>
 					</div>
 
-					<div class="form-field">
-						<label for="PRI" id="PRILabel">PRI</label>
-						<input type="text" class="cadField" id="PRI" class="cadField" name="PRI" readonly>
+					<div class="col-xs-5">
+						<button class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button"><img src="assets/img/reload.png" id="page3-reloadbutton" alt="Reload"> Reset to default</button>
 					</div>
 
-					<div class="form-field">
-						<label for="EEName" id="EENameLabel">Employee Name</label>
-						<input type="text" class="cadField" id="EEName" name="EmployeeName" readonly>
-					</div>
-					<div class="form-field hidden">
-						<label for="EEStreet" id="EEStreetLabel">Employee Address</label>
-						<input type="text" class="cadField" id="EEStreet" name="EmployeeStreet1">
-					</div>
-					<div class="form-field hidden">
-						<label for="EECity" id="EECityLabel">Employee City</label>
-						<input type="text" class="cadField" id="EECity" name="EmployeeCity">
-					</div>
-					<div class="form-field hidden">
-						<label for="EEProvince" id="EEProvinceLabel">Employee Province</label>
-						<input type="text" class="cadField" id="EEProvince" name="EmployeeProvince" >
-					</div>
-					<div class="form-field hidden">
-						<label for="EEPostalCode" id="EEPostalCodeLabel">Employee Postal Code</label>
-						<input type="text" class="cadField" id="EEPostalCode" name="EmployeePostalCode">
-					</div>
+					<div id="cad-text-inputs">
+						<span class="col-xs-12 mrgn-bttm-lg"></span>
 
-					<div class="form-field">
-						<label for="Reason" id="ReasonLabel">Reason</label>
-						<input type="text" class="cadField" id="Reason" name="Reason" value="Other">
-					</div>
 
-					<div class="form-field">
-						<label for="EffectiveDate" id="EffectiveDateLabel">Effective Date</label>
-						<input type="text" class="cadField" id="EffectiveDate" name="EffectiveDate">
-						<span class="validationStatusErrorMessage" id="page3InvalidDate">Invalid Date</span>
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="PayListLabel" for="PayList">Paylist</label>
+							<input id="PayList" type="text" class="cadField" placeholder="####" name="PayList">
+						</div>
 
-					<div class="form-field">
-						<label for="PersonalEmail" id="PersonalEmailLabel">Personal Email</label>
-						<input type="text" class="cadField" id="PersonalEmail" name="PersonalEmail">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="PRILabel" for="PRI">PRI</label>
+							<input id="PRI" type="text" class="cadField" readonly name="PRI">
+						</div>
 
-					<div class="form-field">
-						<label for="CaseNumber" id="CaseNumberLabel">Case Number</label>
-						<input type="text" class="cadField" id="CaseNumber" name="CaseNumber">
-					</div>
+						<div class="col-xs-6 form-field">
+							<label id="EffectiveDateLabel" for="EffectiveDate">Effective Date</label>
+							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate">
+						</div>
 
-					<p class="instruction" id="Page3InstructionsLabel"><b>Letter Customizations</b></p>
-					<p class="instruction" id="Page3InstructionsText">
-						Content with checkmarks are loaded by default based on the information collected from the CAD.
-						Please review, and select or unselect as needed.
-						Selecting field will add to the generated letter, unselected fields will not be displayed on the letter.
-					</p>
+						<div class="col-xs-6 form-field">
+							<label id="CaseNumberLabel" for="CaseNumber">Case #</label>
+							<input id="CaseNumber" type="text" class="cadField" placeholder="######" name="CaseNumber">
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="PensionandDSB" name="PensionandDSB">
-						<label for="PensionandDSB" id="PensionandDSBLabel">Pension and Insurance</label>
-					</div>
+						<div class="col-xs-12 form-field">
+							<label id="EENameLabel" for="EEName">Name</label>
+							<input id="EEName" type="text" class="cadField" readonly name="EmployeeName">
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="DisabilityInsurance" name="DisabilityInsurance">
-						<label for="DisabilityInsurance" id="DisabilityInsuranceLabel">Disability Insurance</label>
-					</div>
+						<div class="col-xs-12 form-field">
+							<label id="PersonalEmailLabel" for="PersonalEmail">Personal Email (Employee)</label>
+							<input id="PersonalEmail" type="text" class="cadField" name="PersonalEmail">
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="PSMIP" name="PSMIP">
-						<label for="PSMIP" id="PSMIPLabel">PSMIP</label>
-						<div class="form-field">
-							<label for="IAN" id="IANLabel">IAN</label>
-							<input type="text" class="cadField" id="IAN" name="PSMIPNo">
+						<div class="col-xs-12 form-field">
+							<label id="ReasonLabel" for="Reason">Reason</label>
+							<input id="Reason" type="text" class="cadField" readonly name="Reason">
 						</div>
 					</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="PSHCP" name="PSHCP">
-						<label for="PSHCP" id="PSHCPLabel">PSHCP</label>
-						<div class="form-field">
-							<label for="PSHCPNo" id="PSHCPNoLabel">PSHCP Number</label>
-							<input type="text" class="cadField" id="PSHCPNo" name="PSHCPNo">
+					<span class="col-xs-12 mrgn-tp-lg"></span>
+
+					<div class="col-xs-7 label-button-lrg">
+						<p class="text-large text-left" id="Page3InstructionsLabel">Letter Customizations:</p>
+					</div>
+
+
+					<div id="cad-checked-inputs">
+						<div class="col-xs-5">
+							<button class="btn btn-default btn-lg pull-right" id="reload-cad" title="Reload" onClick="PopulateScreenCADFields(0)" type="button"><img src="assets/img/reload.png" alt="Reload"> Reset to default</button>
 						</div>
-						<div class="form-field">
-							<label for="PSHCPLevel" id="PSHCPLevelLabel">PSHCP Level</label>
-							<input type="text" class="cadField" id="PSHCPLevel" name="PSHCPLevel">
+
+						<span class="col-xs-12 mrgn-bttm-lg"></span>
+
+						<span class="col-xs-12 text-large text-left mrgn-bttm-lg" id="Page3InstructionsText">
+							Content with checkmarks are loaded by default based on the information collected from the CAD.
+							Please review and select or unselect as needed. Selecting field will add to the generated letter,
+							unselected fields will not be displayed on the letter.
+						</span>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PensionandDSB" class="btn btn-default cadField" type="checkbox" name="PensionandDSB">
+								<label id="PensionandDSBLabel" for="PensionandDSB" class="mrgn-lft-md">Pension and Insurance</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="DCPStatus" name="DCPStatus">
-						<label for="DCPStatus" id="DCPStatusLabel">DCP</label>
-						<div class="form-field">
-							<label for="DCPPlanNo" id="DCPPlanNoLabel">Plan Number</label>
-							<input type="text" class="cadField" id="DCPPlanNo" name="DCPPlanNo">
-							<span class="validationStatusErrorMessage" id="page3InvalidDCPPlan">Blank Plan Number</span>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="DisabilityInsurance" class="btn btn-default cadField" type="checkbox" name="DisabilityInsurance">
+								<label id="DisabilityInsuranceLabel" for="DisabilityInsurance" class="mrgn-lft-md">Disability Insurance</label>
+							</div>
 						</div>
-						<div class="form-field">
-							<label for="CertificateNumber" id="CertificateNumberLabel">Certificate Number</label>
-							<input type="text" class="cadField" id="CertificateNumber" name="DCPCertNo">
+
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP" childField="PSMIPField" onclick="ShowCadField('PSMIPField', event.target.checked)">
+								<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="UnionInsurance" name="UnionInsurance">
-						<label for="UnionInsurance" id="UnionInsuranceLabel">Union Insurance</label>
-					</div>
-
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="BilingualBonus" name="BilingualBonus">
-						<label for="BilingualBonus" id="BilingualBonusLabel">Bilingual Bonus</label>
-					</div>
-
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="AnnualandSickLeave" name="AnnualandSickLeave" checked="checked" disabled>
-						<label for="AnnualandSickLeave" id="AnnualandSickLeaveLabel">Annual and Sick Leave</label>
-						<div class="form-field">
-							<label for="AWW" id="AWWLabel">AWW</label>
-							<input type="text" class="cadField" id="AWW" name="AWW">
+						<div id="PSMIPField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="IAN" type="text" class="cadField" name="PSMIPNo">
+								</div>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="CompensatoryLeave" name="CompensatoryLeave" checked="checked" disabled>
-						<label for="CompensatoryLeave" id="CompensatoryLeaveLabel">Compensatory Leave</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP" childField="PSHCPField" onclick="ShowCadField('PSHCPField', event.target.checked)">
+								<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="PayRevision" name="PayRevision" checked="checked" disabled>
-						<label for="PayRevision" id="PayRevisionLabel">Pay Revision</label>
-					</div>
+						<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
+								<p id="PSHCPLevelLabel" class="hidden" style="display: none;"></p>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<select id="PSHCPLevel" name="PSHCPLevel" class="cadField">
+										<option value="1"> Level 1 </option>
+										<option value="2"> Level 2 </option>
+										<option value="3"> Level 3 </option>
+									</select>
+								</div>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="ContinuousService" name="ContinuousService" checked="checked" disabled>
-						<label for="ContinuousService" id="ContinuousServiceLabel">Continuous Service</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" childField="DCPStatusField" name="DCPStatus" onclick="ShowCadField('DCPStatusField', event.target.checked)">
+								<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md">DCP</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="TermEmployment" name="PartTimeEmployee" checked="checked" disabled>
-						<label for="TermEmployment" id="TermEmploymentLabel">Term Employment</label>
-					</div>
+						<div id="DCPStatusField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<select id="DCPPlanNo" name="DCPPlanNo" class="cadField">
+										<option value="55555"> 55555 </option>
+										<option value="55556"> 55556 </option>
+									</select>
+								</div>
+							</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="UnionDues" name="UnionDues">
-						<label for="UnionDues" id="UnionDuesLabel">Union Dues</label>
-					</div>
+							<div class="col-xs-5">
+								<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo">
+								</div>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="RA" name="RA">
-						<label for="RA" id="RALabel">RA</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="UnionInsurance" class="btn btn-default cadField" type="checkbox" name="UnionInsurance">
+								<label id="UnionInsuranceLabel" for="UnionInsurance" class="mrgn-lft-md ">Union Insurance</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="CreditUnion" name="CreditUnion">
-						<label for="CreditUnion" id="CreditUnionLabel">Credit Union</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="BilingualBonus" class="btn btn-default cadField" type="checkbox" name="BilingualBonus">
+								<label id="BilingualBonusLabel" for="BilingualBonus" class="mrgn-lft-md">Bilingual Bonus</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="GCWCC" name="GCWCC">
-						<label for="GCWCC" id="GCWCCLabel">GOC Workplace Charitable Campaign</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-0">
+							<div class="form-checkbox pull-left">
+								<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave" childField="AnnualandSickLeaveField" onclick="ShowCadField('AnnualandSickLeaveField', event.target.checked)">
+								<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="Garnishments" name="Garnishments">
-						<label for="Garnishments" id="GarnishmentsLabel">Garnishments</label>
-					</div>
+						<div id="AnnualandSickLeaveField" class="col-xs-11 checkbox-type-input">
+							<div class="col-xs-5">
+								<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0" id="AWWLabel">AWW</div>
+								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+									<input id="AWW" type="text" class="cadField" name="AWW">
+								</div>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="StudentLoans" name="StudentLoans">
-						<label for="StudentLoans" id="StudentLoansLabel">Student Loans</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="CompensatoryLeave" class="btn btn-default cadField" type="checkbox" name="CompensatoryLeave">
+								<label id="CompensatoryLeaveLabel" for="CompensatoryLeave" class="mrgn-lft-md">Compensatory Leave</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="LIA" name="LIA">
-						<label for="LIA" id="LIALabel">LIA</label>
-					</div>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PayRevision" class="btn btn-default cadField" type="checkbox" name="PayRevision">
+								<label id="PayRevisionLabel" for="PayRevision" class="mrgn-lft-md">Pay Revision</label>
+							</div>
+						</div>
 
-					<div class="form-field form-field-checkbox">
-						<input type="checkbox" class="cadField" id="Selffunded" name="Selffunded">
-						<label for="Selffunded" id="SelffundedLabel">Self funded Leave Deductions</label>
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="ContinuousService" class="btn btn-default cadField" type="checkbox" name="ContinuousService">
+								<label id="ContinuousServiceLabel" for="ContinuousService" class="mrgn-lft-md">Continuous Service</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="TermEmployment" class="btn btn-default cadField" type="checkbox" name="TermEmployment">
+								<label id="TermEmploymentLabel" for="TermEmployment" class="mrgn-lft-md">Term Employment</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="UnionDues" class="btn btn-default cadField" type="checkbox" name="UnionDues">
+								<label id="UnionDuesLabel" for="UnionDues" class="mrgn-lft-md">Union Dues</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="RA" class="btn btn-default cadField" type="checkbox" name="RA">
+								<label id="RALabel" for="RA" class="mrgn-lft-md">RA</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="CreditUnion" class="btn btn-default cadField" type="checkbox" name="CreditUnion">
+								<label id="CreditUnionLabel" for="CreditUnion" class="mrgn-lft-md">Credit Union</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="GCWCC" class="btn btn-default cadField" type="checkbox" name="GCWCC">
+								<label id="GCWCCLabel" for="GCWCC" class="mrgn-lft-md">GOC Workplace Charitable Campaign</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Garnishments" class="btn btn-default cadField" type="checkbox" name="Garnishments">
+								<label id="GarnishmentsLabel" for="Garnishments" class="mrgn-lft-md">Garnishments</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="StudentLoans" class="btn btn-default cadField" type="checkbox" name="StudentLoans">
+								<label id="StudentLoansLabel" for="StudentLoans" class="mrgn-lft-md">Student Loans</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="LIA" class="btn btn-default cadField" type="checkbox" name="LIA">
+								<label id="LIALabel" for="LIA" class="mrgn-lft-md">LIA</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Selffunded" class="btn btn-default cadField" type="checkbox" name="Selffunded">
+								<label id="SelffundedLabel" for="Selffunded" class="mrgn-lft-md">Self Funded</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Parental" class="btn btn-default cadField" type="checkbox" name="Parental">
+								<label id="ParentalLabel" for="Parental" class="mrgn-lft-md">Parental Leave</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Gradual" class="btn btn-default cadField" type="checkbox" name="Gradual">
+								<label id="GradualLabel" for="Gradual" class="mrgn-lft-md">Gradual Return to Work</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="Parking" class="btn btn-default cadField" type="checkbox" name="Parking">
+								<label id="ParkingLabel" for="Parking" class="mrgn-lft-md">Parking</label>
+							</div>
+						</div>
 					</div>
 				</form>
 			</div>
-			<div class="actionBar">
-				<button class="actionButton" id="page3ButtonGenerateEn" onClick="GoToPage(4,event)">Generate English Letter</button>
-				<button class="actionButton" id="page3ButtonGenerateFr" onClick="GoToPage(4,event)">Generate French Letter</button>
+
+			<div class="actionBar col-xs-12">
+				<button class="actionButton pull-right" id="page3ButtonGenerate" onClick="GoToPage(5,event)">Generate Letter</button>
 			</div>
 		</div>
 
-		<!-- Page 4 -->
-		<div id="page-4" data-pageNo="4" class="page">
+		<!-- Page 5 -->
+		<div id="page-5" data-pageNo="5" class="page">
 			<p class="pageSubTitle" id="page4Subtitle">Review and Export</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
@@ -2101,18 +2353,18 @@
 				</div>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page4ButtonNext" onClick="GoToPage(5,event)">Export to PDF</button>
+				<button class="actionButton" id="page4ButtonNext" onClick="GoToPage(6,event)">Export to PDF</button>
 			</div>
 		</div>
 
-		<!-- Page 5 -->
-		<div id="page-5" data-pageNo="5" class="page">
+		<!-- Page 6 -->
+		<div id="page-6" data-pageNo="6" class="page">
 			<p class="pageSubTitle" id="page5Subtitle">Ready to be sent to EPOST</p>
 			<div class="pageContent pageMiddle">
 				<div class="pageMiddleContent">
-					<img src="assets/img/completed.png" alt="Completed"/><br/>
+					<img src="assets/img/completed.png" alt="Completed" /><br />
 					<p id="page5Instructions">
-						Successfully exported letter to PDF. <br/>
+						Successfully exported letter to PDF. <br />
 						<a href="#" onClick="OpenPDFFile()"><span id="pdfFileName">Placeholder</span></a>
 					</p>
 					<ul id="page5Subnotes" class="subnotes">
@@ -2123,13 +2375,13 @@
 				</div>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page5ButtonNext" onClick="GoToPage(2,event)">Generate next letter</button>
+				<button class="actionButton" id="page5ButtonNext" onClick="GoToPage(1,event)">Generate next letter</button>
 			</div>
 		</div>
-
 	</div>
 	<div id="progress-overlay">
-		<img src="assets/img/spinner.gif" alt="In progress"/>
+		<img src="assets/img/spinner.gif" alt="In progress" />
 	</div>
 </body>
+
 </html>

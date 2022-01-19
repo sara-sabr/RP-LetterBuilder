@@ -388,6 +388,11 @@
 			padding-bottom: 32px;
 		}
 
+		.btn-padding-lg {
+			padding: 10px 22px !important;
+			white-space: pre;
+		}
+
 		form.cad-form {
 			overflow-y: auto;
 		}
@@ -576,6 +581,7 @@
 '	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
 '	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
 	I18N.Add "page3-reloadbutton",		Array("Reset to default", "Réinitialiser")
+	I18N.Add "page3-reloadcad",			Array("Reset to default", "Réinitialiser")
 	I18N.Add "page3ButtonGenerate", 	Array("Generate Letter", "Générer lettre")
 	I18N.Add "page3Instruction",	 	Array("Please verify employee information:", "Svp vérifier les informations de l’employé:")
 	I18N.Add "page4Subtitle",			Array("Review and Export", "Réviser et exporter")
@@ -709,7 +715,7 @@
 			fileSuffix = MOD_SUFFIX_EN
 		End If
 
-		If selectElement.length = 0 Then
+		If selectElement.length = 1 Then
 			For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
 				For Each file in objFolder.Files
 		
@@ -766,6 +772,11 @@
 		For Each messageKey in I18N.keys
 			localizedArray = I18N(messageKey)
 			document.getElementById(messageKey).innerHTML = localizedArray(arrayIdx)
+
+			tag = document.getElementById(messageKey).tagName
+			If tag = "BUTTON" or tag = "SPAN" Then
+				document.getElementById(messageKey).title = localizedArray(arrayIdx)
+			End If
 		Next
 
 		If languageCode = "fr" Then
@@ -797,10 +808,11 @@
 		Set employeeTextInputs = document.getElementById("cad-text-inputs")
 		Set employeeCheckedInputs = document.getElementById("cad-checked-inputs")
 
-		If flag = 1 Then
+		If flag = 0 Then
 			UpdateFieldsInElement employeeTextInputs, employeeRecord
-		End If
+		ElseIf flag = 1 Then
 			UpdateFieldsInElement employeeCheckedInputs, employeeRecord
+		End If
 
 		employeeTextInputs.style.display = "inline"
 		employeeCheckedInputs.style.display = "inline"
@@ -809,6 +821,7 @@
 	Sub UpdateFieldsInElement(element, employeeRecord)
 		For Each inputField In element.getElementsByClassName("cadField")
 			fieldName = inputField.name
+			inputField.value = ""
 			If employeeRecord.Exists(fieldName) Then
 				tagName = inputField.tagName
 				Select Case  tagName
@@ -835,7 +848,6 @@
 
 	Sub ShowCadField(element, visible)
 		Set field = document.getElementById(element)
-
 
 		If visible Then
 			field.style.display = "block"
@@ -867,17 +879,20 @@
 	End Sub
 
 	' Adds in the slashes while typing in the effective Date
-	Sub EffectiveDateFormatting(dateInput)
-		Dim currentDate
-		Set currentDate = document.getElementById(dateInput)
-		If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
+	Sub EffectiveDateFormatting(newEvent)
+		Set currentDate = document.getElementById(newEvent.target.name)
+		key = Mid(newEvent.target.value, Len(currentDate.value), Len(currentDate.value)) 
+		
+		If(IsNumeric(key) AND Len(currentDate.value) <= 10) Then
+			If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
 			tempDate = currentDate.value & "/"
 			currentDate.value = tempDate
-		End If
-
-		If Len(currentDate.value) > 10 Then
+			End If
+		Else
 			currentDate.value = Mid(currentDate.value, 1, Len(currentDate.value) -1) 
 		End If
+	
+		ValidatePage1()
 	End Sub
 
 	' Generate Letter Helper
@@ -1188,6 +1203,7 @@
 			validateAndFormatDate = ""
 		End If
 	End Function
+
 
 	' Get the data from CAD
 	' index is the row number of the PRI we wish to pull out, however doesn't get used anywhere yet.
@@ -1739,6 +1755,38 @@
 		End If
 	End Function
 
+	Sub ValidatePage1()
+		Set letterSelect = document.getElementById("selectLetter")
+		Set languageSelect = document.getElementById("selectLanguage")
+		Set dateInput = document.getElementById("inputEffectiveDate")
+
+		If letterSelect.value <> "--" Then
+			languageSelect.Disabled = false
+
+			If selectLanguage.value <> "--" Then
+				dateInput.Disabled = false
+
+				If Len(dateInput.value) = 10 Then
+					TogglePage1StartButton(true)
+				Else
+					TogglePage1StartButton(false)
+				End If
+			Else
+				dateInput.Disabled = true
+				TogglePage1StartButton(false)
+			End If
+
+		Else
+			languageSelect.Disabled = true
+			dateInput.Disabled = true
+			TogglePage1StartButton(false)
+		End If
+	End Sub
+
+	Function TogglePage1StartButton(isEnabled)
+		document.getElementById("page1ButtonStart").Disabled = Not(isEnabled)
+	End Function
+
 	' Enable or disable the word document generation
 	Function ToggleWordGenerateButtons(isEnabled)
 		document.getElementById("page3ButtonGenerate").Disabled = Not(isEnabled)
@@ -1876,6 +1924,7 @@
 	Function GoToPage1()
 		CheckAvailableModules()
 		ShowProgressOverlay(False)
+		ValidatePage1()
 	End Function
 
 	Function GoToPage2()
@@ -1890,6 +1939,7 @@
 	End Function
 
 	Function GoToPage4()
+		PopulateScreenCADFields(0)
 		PopulateScreenCADFields(1)
 		validateForm()
 		ShowProgressOverlay(False)
@@ -1974,13 +2024,15 @@
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label for="selectLetter" id="page1LetterType">Letter Type</label>
 
-					<select id="selectLetter" class="cadField" name="selectLetter">
+					<select id="selectLetter" class="cadField" name="selectLetter" onchange="ValidatePage1()">
+						<option value="--">Select from List</option>
 					</select>
 				</div>
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label id="page1LanguageSelect">Language of Letter</label>
-					<select id="selectLanguage" class="cadField" name="selectLanguage">
+					<select id="selectLanguage" class="cadField" name="selectLanguage" disabled onchange="ValidatePage1()">
+						<option value="--">Select from List</option>
 						<option id="page1OptionEnglish">English</option>
 						<option id="page1OptionFrench">French</option>
 					</select>
@@ -1988,12 +2040,12 @@
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label id="page1EffectiveDate" for="inputEffectiveDate">Effective Date of Pay Action</label>
-					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" onkeyup="EffectiveDateFormatting('inputEffectiveDate')">
+					<input type="text" id="inputEffectiveDate" class="cadField" name="inputEffectiveDate" oninput="EffectiveDateFormatting(event)" disabled>
 				</div>
 			</div>
 
 			<div class="actionBar col-xs-12">
-				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(2,event)">Lets Get Started</button>
+				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(2,event)" disabled>Lets Get Started</button>
 			</div>
 		</div>
 
@@ -2092,7 +2144,7 @@
 					</div>
 
 					<div class="col-xs-5">
-						<button class="btn btn-default btn-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button"><img src="assets/img/reload.png" id="page3-reloadbutton" alt="Reload"> Reset to default</button>
+						<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(0)" type="button"><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadbutton"></span></button>
 					</div>
 
 					<div id="cad-text-inputs">
@@ -2111,7 +2163,7 @@
 
 						<div class="col-xs-6 form-field">
 							<label id="EffectiveDateLabel" for="EffectiveDate">Effective Date</label>
-							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate" onkeyup="EffectiveDateFormatting('EffectiveDate')">
+							<input id="EffectiveDate" type="text" class="cadField" name="EffectiveDate" oninput="EffectiveDateFormatting(event)">
 						</div>
 
 						<div class="col-xs-6 form-field">
@@ -2144,7 +2196,7 @@
 
 					<div id="cad-checked-inputs">
 						<div class="col-xs-5">
-							<button class="btn btn-default btn-lg pull-right" id="reload-cad" title="Reload" onClick="PopulateScreenCADFields(0)" type="button"><img src="assets/img/reload.png" alt="Reload"> Reset to default</button>
+							<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button"><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadcad"></span></button>
 						</div>
 
 						<span class="col-xs-12 mrgn-bttm-lg"></span>
@@ -2169,68 +2221,75 @@
 							</div>
 						</div>
 
-						<div class="col-xs-12 mrgn-bttm-0">
-							<div class="form-checkbox pull-left">
-								<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP" childField="PSMIPField" onclick="ShowCadField('PSMIPField', event.target.checked)">
-								<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
+						<div class="col-xs-12 mrgn-bttm-md" style="padding-left:0;">
+							<div class="col-xs-12 mrgn-bttm-0">
+								<div class="form-checkbox pull-left">
+									<input id="PSMIP" class="btn btn-default cadField" type="checkbox" name="PSMIP" childField="PSMIPField" onclick="ShowCadField('PSMIPField', event.target.checked)">
+									<label id="PSMIPLabel" for="PSMIP" class="mrgn-lft-md">PSMIP</label>
+								</div>
 							</div>
-						</div>
 
-						<div id="PSMIPField" class="col-xs-11 checkbox-type-input">
-							<div class="col-xs-5">
-								<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
-								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-									<input id="IAN" type="text" class="cadField" name="PSMIPNo">
+							<div id="PSMIPField" class="col-xs-11 checkbox-type-input">
+								<div class="col-xs-5">
+									<div id="IANLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">IAN</div>
+									<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+										<input id="IAN" type="text" class="cadField" name="PSMIPNo">
+									</div>
 								</div>
 							</div>
 						</div>
 
-						<div class="col-xs-12 mrgn-bttm-0">
-							<div class="form-checkbox pull-left">
-								<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP" childField="PSHCPField" onclick="ShowCadField('PSHCPField', event.target.checked)">
-								<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
+						<div class="col-xs-12 mrgn-bttm-md" style="padding-left:0;">
+							<div class="col-xs-12 mrgn-bttm-0">
+								<div class="form-checkbox pull-left">
+									<input id="PSHCP" class="btn btn-default cadField" type="checkbox" name="PSHCP" childField="PSHCPField" onclick="ShowCadField('PSHCPField', event.target.checked)">
+									<label id="PSHCPLabel" for="PSHCP" class="mrgn-lft-md">PSHCP</label>
+								</div>
 							</div>
-						</div>
 
-						<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
-							<div class="col-xs-5">
-								<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
-								<p id="PSHCPLevelLabel" class="hidden" style="display: none;"></p>
-								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-									<select id="PSHCPLevel" name="PSHCPLevel" class="cadField">
-										<option value="1" id="PSHCPLevel1"> Level 1 </option>
-										<option value="2" id="PSHCPLevel2"> Level 2 </option>
-										<option value="3" id="PSHCPLevel3"> Level 3 </option>
-									</select>
+							<div id="PSHCPField" class="col-xs-11 checkbox-type-input">
+								<div class="col-xs-5">
+									<div id="PSHCPNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">PSHCP #</div>
+									<p id="PSHCPLevelLabel" class="hidden" style="display: none;"></p>
+									<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+										<select id="PSHCPLevel" name="PSHCPLevel" class="cadField">
+											<option value="1" id="PSHCPLevel1"> Level 1 </option>
+											<option value="2" id="PSHCPLevel2"> Level 2 </option>
+											<option value="3" id="PSHCPLevel3"> Level 3 </option>
+										</select>
+									</div>
 								</div>
 							</div>
 						</div>
 
-						<div class="col-xs-12 mrgn-bttm-0">
-							<div class="form-checkbox pull-left">
-								<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" childField="DCPStatusField" name="DCPStatus" onclick="ShowCadField('DCPStatusField', event.target.checked)">
-								<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md">DCP</label>
-							</div>
-						</div>
-
-						<div id="DCPStatusField" class="col-xs-11 checkbox-type-input">
-							<div class="col-xs-5">
-								<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
-								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-									<select id="DCPPlanNo" name="DCPPlanNo" class="cadField">
-										<option value="55555"> 55555 </option>
-										<option value="55556"> 55556 </option>
-									</select>
+						<div class="col-xs-12 mrgn-bttm-md" style="padding-left:0; padding-right: 0;">
+							<div class="col-xs-12 mrgn-bttm-0">
+								<div class="form-checkbox pull-left">
+									<input id="DCPStatus" class="btn btn-default cadField" type="checkbox" childField="DCPStatusField" name="DCPStatus" onclick="ShowCadField('DCPStatusField', event.target.checked)">
+									<label id="DCPLabel" for="DCPStatus" class="mrgn-lft-md">DCP</label>
 								</div>
 							</div>
 
-							<div class="col-xs-5">
-								<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
-								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-									<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo">
+							<div id="DCPStatusField" class="col-xs-11 checkbox-type-input">
+								<div class="col-xs-5">
+									<div id="DCPPlanNoLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">DCP Plan #</div>
+									<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+										<select id="DCPPlanNo" name="DCPPlanNo" class="cadField">
+											<option value="55555"> 55555 </option>
+											<option value="55556"> 55556 </option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-xs-5">
+									<div id="CertificateNumberLabel" class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0">Certificate #</div>
+									<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+										<input id="DCPCertNo" type="text" class="cadField" name="DCPCertNo">
+									</div>
 								</div>
 							</div>
 						</div>
+
 
 						<div class="col-xs-12 mrgn-bttm-md">
 							<div class="form-checkbox pull-left">
@@ -2246,18 +2305,20 @@
 							</div>
 						</div>
 
-						<div class="col-xs-12 mrgn-bttm-0">
-							<div class="form-checkbox pull-left">
-								<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave" childField="AnnualandSickLeaveField" onclick="ShowCadField('AnnualandSickLeaveField', event.target.checked)">
-								<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
+						<div class="col-xs-12 mrgn-bttm-md" style="padding-left:0;">
+							<div class="col-xs-12 mrgn-bttm-0">
+								<div class="form-checkbox pull-left">
+									<input id="AnnualandSickLeave" class="btn btn-default cadField" type="checkbox" name="AnnualandSickLeave" childField="AnnualandSickLeaveField" onclick="ShowCadField('AnnualandSickLeaveField', event.target.checked)">
+									<label id="AnnualandSickLeaveLabel" for="AnnualandSickLeave" class="mrgn-lft-md">Annual and Sick Leave</label>
+								</div>
 							</div>
-						</div>
 
-						<div id="AnnualandSickLeaveField" class="col-xs-11 checkbox-type-input">
-							<div class="col-xs-5">
-								<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0" id="AWWLabel">AWW</div>
-								<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
-									<input id="AWW" type="text" class="cadField" name="AWW">
+							<div id="AnnualandSickLeaveField" class="col-xs-11 checkbox-type-input">
+								<div class="col-xs-5">
+									<div class="mrgn col-xs-12 text-left mrgn-bttm-0 mrgn-tp-0" id="AWWLabel">AWW</div>
+									<div class="form-field col-xs-12 mrgn-bttm-0 mrgn-tp-0" style="padding: 0; padding-left: 14px;">
+										<input id="AWW" type="text" class="cadField" name="AWW">
+									</div>
 								</div>
 							</div>
 						</div>
@@ -2399,8 +2460,8 @@
 					<p id="page5Instructions">
 						Successfully exported letter to PDF. <br />
 					</p>
-						<a href="#" onClick="OpenPDFFile()"><span id="pdfFileName">Placeholder</span></a>
-					
+					<a href="#" onClick="OpenPDFFile()"><span id="pdfFileName">Placeholder</span></a>
+
 					<ul id="page5Subnotes" class="subnotes">
 						<li id="page5Subnote1">An email template had been created and ready to be sent to EPOST GD Box.</li>
 						<li id="page5Subnote2">Review the content of the email and send when ready.</li>

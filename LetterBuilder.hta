@@ -575,6 +575,8 @@
 	I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
 	I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 	I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
+	I18N.Add "NonCasualorStudentLabel",	Array("Non Casual/Student", "Non occasionnel/étudiant")
+	I18N.Add "PartTimeEmployeeLabel",	Array("Part-Time", "À temps partiel")
 	I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
 	I18N.Add "PSHCPLevel2",				Array("Level 2", "Niveau 2")
 	I18N.Add "PSHCPLevel3", 			Array("Level 3", "Niveau 3")
@@ -814,6 +816,7 @@
 			UpdateFieldsInElement employeeCheckedInputs, employeeRecord
 		End If
 
+		document.getElementById("Reason").value = "Other"
 		employeeTextInputs.style.display = "inline"
 		employeeCheckedInputs.style.display = "inline"
 	End Sub
@@ -1246,6 +1249,8 @@
 		GetCADDataOtherBenefits index, cadDict, employeeId
 		GetCADDataLIA index, cadDict, employeeId
 		GetCadDataParental index, cadDict, employeeId
+		GetCadDataGroup index, cadDict, employeeId
+		GetCadFullPartTime index, cadDict, employeeId
 
 		Set sheetCad = Nothing
 		Set sheetJOB = Nothing
@@ -1596,6 +1601,38 @@
 		End If
 
 		Set sheetPER = Nothing
+	End Function
+
+	Function GetCadDataGroup(index, cadDict, employeeId)
+	' Sheets
+		Dim sheetJob
+		Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		group = sheetJob.Range("D3").Value
+
+		If group <> "CAD" AND group <> "CAS" AND group <> "SSB" AND group <> "STS" Then
+			cadDict.add "NonCasualorStudent", "1"
+		Else
+			cadDict.add "NonCasualorStudent", ""
+		End If
+
+		Set sheetJob = Nothing
+	End Function
+
+	Function GetCadFullPartTime(index, cadDict, employeeId)
+	' Sheets
+		Dim sheetJob
+		Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		partTime = sheetJob.Range("X3").Value
+
+		If partTime = "P" Then
+			cadDict.add "PartTimeEmployee", "1"
+		Else
+			cadDict.add "PartTimeEmployee", ""
+		End If
+
+		Set sheetJob = Nothing
 	End Function
 
 	' Simple filters on one column
@@ -2425,6 +2462,20 @@
 							<div class="form-checkbox pull-left">
 								<input id="Parking" class="btn btn-default cadField" type="checkbox" name="Parking">
 								<label id="ParkingLabel" for="Parking" class="mrgn-lft-md">Parking</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="NonCasualorStudent" class="btn btn-default cadField" type="checkbox" name="NonCasualorStudent">
+								<label id="NonCasualorStudentLabel" for="NonCasualorStudent" class="mrgn-lft-md">Non Casual/Student</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PartTimeEmployee" class="btn btn-default cadField" type="checkbox" name="PartTimeEmployee">
+								<label id="PartTimeEmployeeLabel" for="PartTimeEmployee" class="mrgn-lft-md">Part-Time</label>
 							</div>
 						</div>
 					</div>

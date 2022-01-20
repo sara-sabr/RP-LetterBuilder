@@ -511,6 +511,8 @@
 	I18N.Add "page1LanguageSelect",     Array("Language of Letter", "Langue de la lettre")
 	I18N.Add "page1OptionEnglish",      Array("English", "Anglais")
 	I18N.Add "page1OptionFrench",       Array("French", "Français")
+	I18N.Add "page1DefaultLetter",    	Array("Select from List", "Sélectionner dans la liste")
+	I18N.Add "page1DefaultLanguage",    Array("Select from List", "Sélectionner dans la liste")
 	I18N.Add "page1EffectiveDate",     	Array("Effective Date of Pay Action (dd/mm/yyyy)", "Date d’effet de l'action de paye (jj/mm/aaaa)")
 	I18N.Add "page1ButtonStart",     	Array("Lets get started", "Débuter")
 	I18N.Add "page1CadFileLabel",    	Array("CAD", "TBAC")
@@ -531,7 +533,8 @@
 	I18N.Add "page2ContentL3",			Array("Ensure the following codes on the CAD are checked DED, PER, JOB, ERN, and BEN", "Assurez-vous que les onglets suivants sont cochés : DED, PER, JOB, ERN, BEN.")
 	I18N.Add "page2ContentL4",			Array("Press “Auto Load” on CAD to populate employee data", "Cliquez sur Chargement automatique pour télécharger les données de l’employé")
 	I18N.Add "page2ContentL5",			Array("Once complete, click next on this screen to continue", "Une fois complété, cliquez sur Suivant au bas de cet écran pour continuer")
-	I18N.Add "page2ButtonNext",     	Array("Next", "Suivant")
+	I18N.Add "page2ButtonStart",     	Array("Lets get started", "Débuter")
+	I18N.Add "page3ButtonNext",     	Array("Next", "Suivant")
 	I18N.Add "page3Subtitle",			Array("Verify Information", "Vérifier les informations")
 	I18N.Add "PayListLabel",			Array("Pay List", "Liste de paye")
 	I18N.Add "PRILabel",				Array("PRI", "CIDP")
@@ -575,11 +578,15 @@
 	I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
 	I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 	I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
+	I18N.Add "NonCasualorStudentLabel",	Array("Non Casual/Student", "Non occasionnel/étudiant")
+	I18N.Add "PartTimeEmployeeLabel",	Array("Part-Time", "À temps partiel")
 	I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
 	I18N.Add "PSHCPLevel2",				Array("Level 2", "Niveau 2")
 	I18N.Add "PSHCPLevel3", 			Array("Level 3", "Niveau 3")
 '	I18N.Add "page3InvalidDate",		Array("Missing or Invalid Date", "Date invalide ou manquant")
 '	I18N.Add "page3InvalidDCPPlan",		Array("Missing or Invalid DCP Plan Number", "Numéro de régime RSD invalide ou manquant")
+	I18N.Add "page3-reloadbutton-text",	Array("Reset Information", "Informations sur le repos")
+	I18N.Add "page3-reloadcad-text",	Array("Reset Information", "Informations sur le repos")
 	I18N.Add "page3-reloadbutton",		Array("Reset Employee Information", "Réinitialiser l'employé")
 	I18N.Add "page3-reloadcad",			Array("Reset Letter Customizations", "Lettre de réinitialisation")
 	I18N.Add "page3ButtonGenerate", 	Array("Generate Letter", "Générer lettre")
@@ -691,8 +698,11 @@
 		attachmentsEN.Clear
 		attachmentsFR.Clear
 		
+		document.getElementById("selectLetter").value = "--"
+		document.getElementById("selectLanguage").value = "--"
 		document.getElementById("inputEffectiveDate").value = ""
 		document.getElementById("cad-form").reset()
+		
 	End Sub
 
 	' Close CAD
@@ -771,11 +781,11 @@
 		'Flip all IDs
 		For Each messageKey in I18N.keys
 			localizedArray = I18N(messageKey)
-			document.getElementById(messageKey).innerHTML = localizedArray(arrayIdx)
 
-			tag = document.getElementById(messageKey).tagName
-			If tag = "BUTTON" or tag = "SPAN" Then
+			If document.getElementById(messageKey).getAttribute("idTextAsTitle") Then
 				document.getElementById(messageKey).title = localizedArray(arrayIdx)
+			Else		
+				document.getElementById(messageKey).innerHTML = localizedArray(arrayIdx)		
 			End If
 		Next
 
@@ -814,6 +824,7 @@
 			UpdateFieldsInElement employeeCheckedInputs, employeeRecord
 		End If
 
+		document.getElementById("Reason").value = "Other"
 		employeeTextInputs.style.display = "inline"
 		employeeCheckedInputs.style.display = "inline"
 	End Sub
@@ -1246,6 +1257,8 @@
 		GetCADDataOtherBenefits index, cadDict, employeeId
 		GetCADDataLIA index, cadDict, employeeId
 		GetCadDataParental index, cadDict, employeeId
+		GetCadDataGroup index, cadDict, employeeId
+		GetCadFullPartTime index, cadDict, employeeId
 
 		Set sheetCad = Nothing
 		Set sheetJOB = Nothing
@@ -1596,6 +1609,38 @@
 		End If
 
 		Set sheetPER = Nothing
+	End Function
+
+	Function GetCadDataGroup(index, cadDict, employeeId)
+	' Sheets
+		Dim sheetJob
+		Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		group = sheetJob.Range("D3").Value
+
+		If group <> "CAD" AND group <> "CAS" AND group <> "SSB" AND group <> "STS" Then
+			cadDict.add "NonCasualorStudent", "1"
+		Else
+			cadDict.add "NonCasualorStudent", ""
+		End If
+
+		Set sheetJob = Nothing
+	End Function
+
+	Function GetCadFullPartTime(index, cadDict, employeeId)
+	' Sheets
+		Dim sheetJob
+		Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
+
+		partTime = sheetJob.Range("X3").Value
+
+		If partTime = "P" Then
+			cadDict.add "PartTimeEmployee", "1"
+		Else
+			cadDict.add "PartTimeEmployee", ""
+		End If
+
+		Set sheetJob = Nothing
 	End Function
 
 	' Simple filters on one column
@@ -1996,7 +2041,7 @@
 
 			<!-- Title -->
 			<div>
-				<h1 id="pageTitle">Letter Builder</h1> V2.0
+				<h1 id="pageTitle">Letter Builder</h1> V2.1
 				<!-- Version String -->
 				<div id="pageIndicator">
 					<span class="pageIndicatorCircle pageIndicatorCircle-1"></span>
@@ -2025,14 +2070,14 @@
 					<label for="selectLetter" id="page1LetterType">Letter Type</label>
 
 					<select id="selectLetter" class="cadField" name="selectLetter" onchange="ValidatePage1()">
-						<option value="--">Select from List</option>
+						<option id="page1DefaultLetter" value="--">Select from List</option>
 					</select>
 				</div>
 
 				<div class="col-xs-8 col-xs-offset-2 form-field">
 					<label id="page1LanguageSelect">Language of Letter</label>
 					<select id="selectLanguage" class="cadField" name="selectLanguage" disabled onchange="ValidatePage1()">
-						<option value="--">Select from List</option>
+						<option id="page1DefaultLanguage" value="--">Select from List</option>
 						<option id="page1OptionEnglish">English</option>
 						<option id="page1OptionFrench">French</option>
 					</select>
@@ -2103,7 +2148,7 @@
 				</button>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page1ButtonStart" onClick="GoToPage(3,event)">Lets get started</button>
+				<button class="actionButton" id="page2ButtonStart" onClick="GoToPage(3,event)">Lets get started</button>
 			</div>
 		</div>
 
@@ -2123,7 +2168,7 @@
 				</div>
 			</div>
 			<div class="actionBar">
-				<button class="actionButton" id="page2ButtonNext" onClick="GoToPage(4,event)">Next</button>
+				<button class="actionButton" id="page3ButtonNext" onClick="GoToPage(4,event)">Next</button>
 			</div>
 		</div>
 
@@ -2144,7 +2189,7 @@
 					</div>
 
 					<div class="col-xs-5">
-						<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(0)" type="button"><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadbutton"></span></button>
+						<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(0)" type="button" id="page3-reloadbutton" idTextAsTitle=true><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadbutton-text"></span></button>
 					</div>
 
 					<div id="cad-text-inputs">
@@ -2196,7 +2241,7 @@
 
 					<div id="cad-checked-inputs">
 						<div class="col-xs-5">
-							<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button"><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadcad"></span></button>
+							<button class="btn btn-default btn-padding-lg pull-right" onClick="PopulateScreenCADFields(1)" type="button" id="page3-reloadcad" idTextAsTitle=true><img src="assets/img/reload.png">&nbsp;<span id="page3-reloadcad-text"></span></button>
 						</div>
 
 						<span class="col-xs-12 mrgn-bttm-lg"></span>
@@ -2425,6 +2470,20 @@
 							<div class="form-checkbox pull-left">
 								<input id="Parking" class="btn btn-default cadField" type="checkbox" name="Parking">
 								<label id="ParkingLabel" for="Parking" class="mrgn-lft-md">Parking</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="NonCasualorStudent" class="btn btn-default cadField" type="checkbox" name="NonCasualorStudent">
+								<label id="NonCasualorStudentLabel" for="NonCasualorStudent" class="mrgn-lft-md">Non Casual/Student</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="PartTimeEmployee" class="btn btn-default cadField" type="checkbox" name="PartTimeEmployee">
+								<label id="PartTimeEmployeeLabel" for="PartTimeEmployee" class="mrgn-lft-md">Part-Time</label>
 							</div>
 						</div>
 					</div>

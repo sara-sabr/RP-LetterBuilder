@@ -108,7 +108,7 @@ I18N.Add "SelffundedLabel",			Array("Self funded", "Retenues pour congé autofin
 I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
 I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
-I18N.Add "NonCasualorStudentLabel",	Array("Non Casual/Student", "Non occasionnel/étudiant")
+I18N.Add "InvCheck-CasualorStudentLabel",	Array("Casual/Student", "Occasionnel/étudiant")
 I18N.Add "PartTimeEmployeeLabel",	Array("Part-Time", "À temps partiel")
 I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
 I18N.Add "PSHCPLevel2",				Array("Level 2", "Niveau 2")
@@ -225,7 +225,7 @@ Sub ResetData()
     document.getElementById("selectLanguage").value = "--"
     document.getElementById("inputEffectiveDate").value = ""
     document.getElementById("cad-form").reset()
-    
+    document.getElementById("pdfFileName").innerHTML = "Placeholder"
 End Sub
 
 ' Close CAD
@@ -238,30 +238,49 @@ End Sub
 'Check for available modules and add them to a list
 Sub CheckAvailableModules()
     Set fso = CreateObject("Scripting.FileSystemObject")
-    Dim fileSuffix, languageCode, moduleName, propertyFile, selectElement, optionElement
+    Dim altSuffix, altModule, fileSuffix, languageCode, moduleName, propertyFile, selectElement, optionElement
     languageCode = document.getElementById("html").lang
     Set selectElement = document.getElementById("selectLetter")
+
+    Dim langArr(2)
     If languageCode = "fr" Then
         fileSuffix = MOD_SUFFIX_FR
+        altSuffix = MOD_SUFFIX_EN
     Else
         fileSuffix = MOD_SUFFIX_EN
+        altSuffix = MOD_SUFFIX_FR
     End If
 
     If selectElement.length = 1 Then
         For Each objFolder in fso.GetFolder(".\Templates\").SubFolders
+            langArr(0) = ""
+            langArr(1) = ""
+
             For Each file in objFolder.Files
-    
                 ' Grab all files that end with -EN.docx and -FR.docx in all the template folders
-                If instr(file.name, fileSuffix) <> 0 Then
                 
-                moduleName = Replace(file.name, fileSuffix, "")
+                If instr(file.name, fileSuffix) <> 0 Then
+                    moduleName = Replace(file.name, fileSuffix, "")
+                    langArr(0) = moduleName
+                ElseIf instr(file.name, altSuffix) <> 0 Then
+                    altModule = Replace(file.name, altSuffix, "")
+                    langArr(1) = altModule
                 ElseIf instr(file.name, MOD_CONFIG) <> 0 Then
-                propertyFile = file.Path
+                    propertyFile = file.Path
                 End If
+
+                ' Dynamically add module label to I18N
+                If langArr(0) <> "" AND langArr(1) <> "" Then
+                    I18N.Add "letter-" & langArr(0) , langArr
+                End If
+
+                
             Next
             If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
                 modulesAvailable.Add moduleName, propertyFile
                 Set optionElement = document.createElement("option")
+                optionElement.id=   "letter-" & moduleName
+                optionElement.value = moduleName
                 optionElement.text = moduleName
                 selectElement.Add optionElement
             End If
@@ -310,11 +329,9 @@ Sub TranslateScreen(languageCode, e)
     If languageCode = "fr" Then
         document.getElementById("languageEnglish").focus()
         document.getElementById("fip").src = "assets/img/fip-fr.png"
-        document.getElementById("Reason").value = "Autre"
     Else
         document.getElementById("languageFrench").focus()
         document.getElementById("fip").src = "assets/img/fip-en.png"
-        document.getElementById("Reason").value = "Other"
     End If
     document.getElementById("fileCadName").innerText = FN_CAD
     document.getElementById("fileEnLetterName").innerText = FN_ENGLISH_LETTER
@@ -337,7 +354,14 @@ Sub PopulateScreenCADFields(flag)
     ElseIf flag = 1 Then
         UpdateFieldsInElement employeeCheckedInputs, employeeRecord
     End If
-    document.getElementById("Reason").value = "Other"
+
+
+    If document.getElementById("selectLanguage").value = "French" Then
+        document.getElementById("Reason").value = configurationSettings("reason.fr")
+    Else
+        document.getElementById("Reason").value = configurationSettings("reason.en")
+    End If
+
     employeeTextInputs.style.display = "inline"
     employeeCheckedInputs.style.display = "inline"
 End Sub
@@ -451,7 +475,7 @@ Sub CreatePDF()
 End Sub
 ' Open PDF File.
 Sub OpenPDFFile()
-    objShell.Run(pdfFilePath)
+    objShell.Run("""" & pdfFilePath & """")
 End Sub
 ' Clean up Word
 Sub CleanUpWord()
@@ -606,11 +630,12 @@ End Function
 Function PopulateFieldsManualInput()
     Set listOfInputs = document.getElementsByTagName("input")
     Set listOfSelects = document.getElementsByTagName("select")
+
     For Each inputField in listOfInputs
         If InStr(inputField.className, "cadField") Then
             fieldName = inputField.name
             If inputField.type = "checkbox" Then
-                If inputField.checked = true Then
+                If (inputField.getAttribute("Data-Invert-Check") AND inputField.checked=false) OR inputField.checked = true Then
                     employeeRecord(fieldName) = "1"
                 Else
                     employeeRecord(fieldName) = ""
@@ -1018,9 +1043,9 @@ Function GetCadDataGroup(index, cadDict, employeeId)
     Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
     group = sheetJob.Range("D3").Value
     If group <> "CAD" AND group <> "CAS" AND group <> "SSB" AND group <> "STS" Then
-        cadDict.add "NonCasualorStudent", "1"
+        cadDict.add "InvCheck-CasualorStudent", ""
     Else
-        cadDict.add "NonCasualorStudent", ""
+        cadDict.add "InvCheck-CasualorStudent", "1"
     End If
     Set sheetJob = Nothing
 End Function
@@ -1281,6 +1306,7 @@ End Function
 ' Go to the given page number
 Function GoToPage(pageNo, e)
     ' Show page first
+    document.getElementById("cad-form-container").scrollTop = 0
     document.body.className = "page-" & pageNo
     ShowProgressOverlay(True)
 

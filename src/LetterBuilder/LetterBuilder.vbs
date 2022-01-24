@@ -109,6 +109,7 @@ I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité
 I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
 I18N.Add "InvCheck-CasualorStudentLabel",	Array("Casual/Student", "Occasionnel/étudiant")
+I18N.Add "BackToBackLabel",	        Array("Back to Back LWOP", "CNP dos à dos")
 I18N.Add "PartTimeEmployeeLabel",	Array("Part-Time", "À temps partiel")
 I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
 I18N.Add "PSHCPLevel2",				Array("Level 2", "Niveau 2")
@@ -273,8 +274,6 @@ Sub CheckAvailableModules()
                 If langArr(0) <> "" AND langArr(1) <> "" Then
                     I18N.Add "letter-" & langArr(0) , langArr
                 End If
-
-                
             Next
             If Not(IsNull(moduleName)) And Not(IsNull(propertyFile)) Then
                 modulesAvailable.Add moduleName, propertyFile
@@ -1240,6 +1239,10 @@ End Sub
 
 Function TogglePage1StartButton(isEnabled)
     document.getElementById("page1ButtonStart").Disabled = Not(isEnabled)
+End Function
+
+Function ToggleNotCheck(parent, child)
+    document.getElementbyID(child).checked = NOT document.getElementbyID(parent).checked
 End Function
 
 ' Enable or disable the word document generation

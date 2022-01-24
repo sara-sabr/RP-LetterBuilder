@@ -38,7 +38,7 @@
 
 			<!-- Title -->
 			<div>
-				<h1 id="pageTitle">Letter Builder</h1> V2.1
+				<h1 id="pageTitle">Letter Builder</h1> V2.2
 				<!-- Version String -->
 				<div id="pageIndicator">
 					<span class="pageIndicatorCircle pageIndicatorCircle-1"></span>
@@ -481,6 +481,20 @@
 							<div class="form-checkbox pull-left">
 								<input id="PartTimeEmployee" class="btn btn-default cadField" type="checkbox" name="PartTimeEmployee">
 								<label id="PartTimeEmployeeLabel" for="PartTimeEmployee" class="mrgn-lft-md">Part-Time</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md">
+							<div class="form-checkbox pull-left">
+								<input id="BackToBack" class="btn btn-default cadField" type="checkbox" name="BackToBack" onclick="ToggleNotCheck('BackToBack', 'Not-BackToBack')">
+								<label id="BackToBackLabel" for="BackToBack" class="mrgn-lft-md">Back to Back LWOP</label>
+							</div>
+						</div>
+
+						<div class="col-xs-12 mrgn-bttm-md hidden">
+							<div class="form-checkbox pull-left">
+								<input id="Not-BackToBack" class="btn btn-default cadField" type="checkbox" name="Not-BackToBack">
+								<label id="Not-BackToBackLabel" for="Not-BackToBack" class="mrgn-lft-md">Back to Back LWOP</label>
 							</div>
 						</div>
 					</div>

@@ -363,12 +363,12 @@ Sub RunPopulateScreenCADFields(flag)
     Set employeeRecord = GetCADData(0)
     Set employeeTextInputs = document.getElementById("cad-text-inputs")
     Set employeeCheckedInputs = document.getElementById("cad-checked-inputs")
+
     If flag = 0 Then
         UpdateFieldsInElement employeeTextInputs, employeeRecord
     ElseIf flag = 1 Then
         UpdateFieldsInElement employeeCheckedInputs, employeeRecord
     End If
-
 
     If document.getElementById("selectLanguage").value = "French" Then
         document.getElementById("Reason").value = configurationSettings("reason.fr")
@@ -393,15 +393,6 @@ Sub UpdateFieldsInElement(element, employeeRecord)
                 Case "INPUT"
                     If inputField.type = "text" Then
                         inputField.value = employeeRecord(fieldName)
-                        
-                        If(inputField.hasAttribute("placeholder")) Then
-                            If(inputField.value <> "") Then
-                                document.getElementById(inputField.id + "-placeholder").textContent = ""
-                            Else
-                                placeholderText = inputField.getAttribute("placeholder")
-                                document.getElementById(inputField.id + "-placeholder").textContent = placeholderText
-                            End If
-                        End If
                     ElseIf inputField.type = "checkbox" Then
                         If employeeRecord(fieldName) <> "" Then
                         inputField.checked = true
@@ -416,7 +407,18 @@ Sub UpdateFieldsInElement(element, employeeRecord)
                     inputField.value = employeeRecord(fieldName)
             End Select
         End If
+
+        If(inputField.hasAttribute("placeholder")) Then
+            If(Len(inputField.value) > 0) Then
+                document.getElementById(inputField.id + "-placeholder").textContent = ""
+            Else
+                placeholderText = inputField.getAttribute("placeholder")
+                document.getElementById(inputField.id + "-placeholder").textContent = placeholderText
+            End If
+        End If
     Next
+
+    validateForm()
 End Sub
 
 Sub ShowCadField(element, visible)

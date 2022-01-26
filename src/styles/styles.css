@@ -98,6 +98,18 @@ div.pageContent {
     overflow-y: auto;
 }
 
+.placeholder {
+    position: absolute;
+    bottom: -2px;
+    left: 23px;
+    width: calc(100% - 60px);
+    height: 24px;
+    overflow: hidden;
+    text-align: left;
+    color: #8A8A8A;
+    font-size: 20px;
+}
+
 ul#page2Subnotes {
     padding-top: 32px;
     width: 445px;
@@ -235,7 +247,7 @@ div.actionBar {
 button.actionButton {
     padding: 12px 21px;
     margin: auto 0;
-    min-width: 194px;
+    /* min-width: 194px; */
     height: 58px;
     border: 1px solid #26374A;
     font-size: 22px;
@@ -271,14 +283,18 @@ div.page1-recheckButtonbar {
 }
 
 button.secondaryButton {
-    min-width: 105px;
-    padding: 12px 21px;
-    height: 43px;
+    box-sizing: border-box;
+    padding: 8px 20px;
     font-size: 16px;
     background-color: #EAEBED;
     border-color: #DCDEE1;
     color: #335075;
     border-radius: 5px;
+}
+
+button.secondaryButton span{
+   padding-bottom: 64px;
+   padding-top:0px
 }
 
 button.secondaryButton>img.button-icon {

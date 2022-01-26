@@ -1393,7 +1393,7 @@ Function validateForm()
     ' Validate EffectiveDate
     Set targetElement = document.getElementById("EffectiveDate")
     If validateAndFormatDate(targetElement.value) = "" Then
-        targetElement.parentElement.parentElement.className = "col-xs-6 form-field form-field-error"
+        targetElement.parentElement.parentElement.className = "col-xs-6 form-field"
         ToggleWordGenerateButtons(false)
     Else
         targetElement.parentElement.className = "col-xs-6 form-field"

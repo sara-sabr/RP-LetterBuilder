@@ -17,7 +17,7 @@ function backspacePolyfill() {
     document.addEventListener('selectionchange', function () {
         var element = document.activeElement;
 
-        if (element.tagName === 'INPUT' && element.type === 'text')
+        if (element.tagName === 'INPUT' && element.type === 'text' && element.hasAttribute("placeholder"))
             placeholderPolyfill(element.id)
     });
 }
@@ -27,7 +27,7 @@ function placeholderPolyfill(id) {
     var input = document.getElementById(id)
     var placeholderText = document.getElementById(id + "-placeholder")
 
-    if (input.value != "")
+    if (input.hasAttribute("placeholder") && input.value != "")
         placeholderText.textContent = ""
     else
         placeholderText.textContent = input.getAttribute("placeholder")

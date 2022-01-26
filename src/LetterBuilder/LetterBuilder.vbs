@@ -88,6 +88,7 @@ I18N.Add "PSHCPNoLabel",			Array("PSHCP Number", "Numéro RSSFP")
 I18N.Add "PSHCPLevelLabel",			Array("PSHCP Level", "Niveau RSSFP")
 I18N.Add "DCPLabel",			    Array("DCP Status", "Statut RSD")
 I18N.Add "DCPPlanNoLabel",			Array("DCP Plan Number", "Numéro de régime RSD")
+I18N.Add "DCP-Option-Default",		Array("Select", "Sélectionnez")
 I18N.Add "CertificateNumberLabel",	Array("Certificate Number", "Numéro de certificat")
 I18N.Add "UnionInsuranceLabel",		Array("Union Insurance", "Assurance syndicale")
 I18N.Add "BilingualBonusLabel",		Array("Bilingual Bonus","Prime au bilinguisme")
@@ -227,6 +228,8 @@ Sub ResetData()
     document.getElementById("inputEffectiveDate").value = ""
     document.getElementById("cad-form").reset()
     document.getElementById("pdfFileName").innerHTML = "Placeholder"
+
+    placeholderPolyfill("inputEffectiveDate")
 End Sub
 
 ' Close CAD
@@ -295,12 +298,11 @@ Sub CheckInstall()
     Call UpdateValidationStatusEntry("page1FrLtrLabel", letterFrFile)
     If FileExists(cadFile) AND _
         FileExists(letterEnFile) AND _
-        FileExists(letterFrFile) AND _
-        ValidateAttachments() Then
-        document.getElementById("page1ButtonStart").disabled = false
+        FileExists(letterFrFile) Then
+        document.getElementById("page2ButtonStart").disabled = false
         document.getElementById("recheck-install").className = "page1-recheckButtonbar hidden"
     Else
-        document.getElementById("page1ButtonStart").disabled = true
+        document.getElementById("page2ButtonStart").disabled = true
         document.getElementById("recheck-install").className = "page1-recheckButtonbar"
     End If
 End Sub
@@ -345,15 +347,30 @@ End Sub
 ' 1: Populate entire Form
 ']
 Sub PopulateScreenCADFields(flag)
+    ' Show loading spinner
+    ShowProgressOverlay(true)
+
+     Select Case flag
+        Case 0
+            window.setTimeOut "RunPopulateScreenCADFields(0)", 2000, "VBScript"
+        Case 1
+            window.setTimeOut "RunPopulateScreenCADFields(1)", 2000, "VBScript"
+        Case Else
+    End Select
+    
+    
+End Sub
+
+Sub RunPopulateScreenCADFields(flag)
     Set employeeRecord = GetCADData(0)
     Set employeeTextInputs = document.getElementById("cad-text-inputs")
     Set employeeCheckedInputs = document.getElementById("cad-checked-inputs")
+
     If flag = 0 Then
         UpdateFieldsInElement employeeTextInputs, employeeRecord
     ElseIf flag = 1 Then
         UpdateFieldsInElement employeeCheckedInputs, employeeRecord
     End If
-
 
     If document.getElementById("selectLanguage").value = "French" Then
         document.getElementById("Reason").value = configurationSettings("reason.fr")
@@ -363,7 +380,11 @@ Sub PopulateScreenCADFields(flag)
 
     employeeTextInputs.style.display = "inline"
     employeeCheckedInputs.style.display = "inline"
+
+    ' Hide loading spinner
+    ShowProgressOverlay(false)
 End Sub
+
 Sub UpdateFieldsInElement(element, employeeRecord)
     For Each inputField In element.getElementsByClassName("cadField")
         fieldName = inputField.name
@@ -388,8 +409,20 @@ Sub UpdateFieldsInElement(element, employeeRecord)
                     inputField.value = employeeRecord(fieldName)
             End Select
         End If
+
+        If(inputField.hasAttribute("placeholder")) Then
+            If(Len(inputField.value) > 0) Then
+                document.getElementById(inputField.id + "-placeholder").textContent = ""
+            Else
+                placeholderText = inputField.getAttribute("placeholder")
+                document.getElementById(inputField.id + "-placeholder").textContent = placeholderText
+            End If
+        End If
     Next
+
+    validateForm()
 End Sub
+
 Sub ShowCadField(element, visible)
     Set field = document.getElementById(element)
     If visible Then
@@ -398,6 +431,7 @@ Sub ShowCadField(element, visible)
         field.style.display = "none"
     End If
 End Sub
+
 ' Set document language
 Sub SetDocumentLanguage()
     Dim docLang
@@ -555,8 +589,15 @@ End Function
 ' Load module information
 Function LoadSelectedModule(moduleName)
     Set fso = CreateObject("Scripting.FileSystemObject")
+    ' Reset the configuration settings on Load
+    Set configurationSettings = Nothing
+    Set configurationSettings = CreateObject("Scripting.Dictionary")
     Dim moduleLocation, moduleProperties
+
     moduleProperties = modulesAvailable(moduleName)
+
+   
+
     LoadConfig(configFile)
     LoadConfig(moduleProperties)
     moduleLocation = Replace(moduleProperties, "\" & MOD_CONFIG, "")
@@ -577,6 +618,8 @@ Function LoadSelectedModule(moduleName)
             End If
         Next
     Next
+
+    Set fso = Nothing
 End Function
 ' Read configuration files
 Function LoadConfig(filePath)
@@ -604,17 +647,20 @@ Function LoadConfig(filePath)
 End Function
 ' Get the standard file name. You must call this only after creating employeeRecord
 Function GetFileNameToUse()
-    Dim dayPortion, monthPortion
+    Dim dayPortion, monthPortion, employeeName
     'dayPortion = Day(GetEffectiveDate())
     'monthPortion = Month(GetEffectiveDate())
     effectiveDate = GetEffectiveDateUserInput()
     employeeRecord("EffectiveDate") = GetEffectiveDateUserInput()
     effectiveDate = Replace(effectiveDate, "/", "")
+
+    employeeName = Split(employeeRecord("EmployeeName"))
+
     
     If documentLanguage(1) = "French" Then
-        GetFileNameToUse = effectiveDate & configurationSettings("prefix.fr") & employeeRecord("EmployeeName")
+        GetFileNameToUse = effectiveDate & configurationSettings("prefix.fr") & employeeName(0) & "_" & Mid(employeeName(1),1,1)
     Else
-        GetFileNameToUse = effectiveDate & configurationSettings("prefix.en") & employeeRecord("EmployeeName")
+        GetFileNameToUse = effectiveDate & configurationSettings("prefix.en") & employeeName(0) & "_" & Mid(employeeName(1),1,1)
     End IF
 End Function
 ' Get the case number. You must call this only after creating employeeRecord
@@ -1351,10 +1397,8 @@ Function validateForm()
     ' Validate EffectiveDate
     Set targetElement = document.getElementById("EffectiveDate")
     If validateAndFormatDate(targetElement.value) = "" Then
-        targetElement.parentElement.className = "col-xs-6 form-field form-field-error"
         ToggleWordGenerateButtons(false)
     Else
-        targetElement.parentElement.className = "col-xs-6 form-field"
         ToggleWordGenerateButtons(true)
     End If
     ' Validate DCP Plan No
@@ -1387,10 +1431,10 @@ Function GoToPage3()
 End Function
 
 Function GoToPage4()
+    ShowProgressOverlay(False)
     PopulateScreenCADFields(0)
     PopulateScreenCADFields(1)
     validateForm()
-    ShowProgressOverlay(False)
 End Function
 
 Function GoToPage5()

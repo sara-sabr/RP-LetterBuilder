@@ -27,6 +27,8 @@ function placeholderPolyfill(id) {
     var input = document.getElementById(id)
     var placeholderText = document.getElementById(id + "-placeholder")
 
+    if (!input || !placeholderText) return;
+
     if (input.hasAttribute("placeholder") && input.value != "")
         placeholderText.textContent = ""
     else

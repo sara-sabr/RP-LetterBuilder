@@ -370,7 +370,7 @@ div.form-field>span.validationStatusErrorMessage {
 }
 
 div.form-field-error>span.validationStatusErrorMessage {
-    display: inherit;
+    display: inline;
 }
 
 ul.validationEntries>li.success>span.validationStatusSuccess,

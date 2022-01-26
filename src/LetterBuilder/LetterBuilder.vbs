@@ -228,6 +228,8 @@ Sub ResetData()
     document.getElementById("inputEffectiveDate").value = ""
     document.getElementById("cad-form").reset()
     document.getElementById("pdfFileName").innerHTML = "Placeholder"
+
+    placeholderPolyfill("inputEffectiveDate")
 End Sub
 
 ' Close CAD
@@ -1395,10 +1397,8 @@ Function validateForm()
     ' Validate EffectiveDate
     Set targetElement = document.getElementById("EffectiveDate")
     If validateAndFormatDate(targetElement.value) = "" Then
-        targetElement.parentElement.parentElement.className = "col-xs-6 form-field"
         ToggleWordGenerateButtons(false)
     Else
-        targetElement.parentElement.className = "col-xs-6 form-field"
         ToggleWordGenerateButtons(true)
     End If
     ' Validate DCP Plan No

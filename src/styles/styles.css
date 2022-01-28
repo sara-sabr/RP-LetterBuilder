@@ -98,6 +98,18 @@ div.pageContent {
     overflow-y: auto;
 }
 
+.placeholder {
+    position: absolute;
+    bottom: -2px;
+    left: 23px;
+    width: calc(100% - 60px);
+    height: 24px;
+    overflow: hidden;
+    text-align: left;
+    color: #8A8A8A;
+    font-size: 20px;
+}
+
 ul#page2Subnotes {
     padding-top: 32px;
     width: 445px;
@@ -190,11 +202,10 @@ div#pageIndicator {
 }
 
 .checkbox-type-input {
-    margin-left: 48px;
-    border-left: 2px rgba(167, 167, 167, 0.15) solid;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    border-right: 2px rgba(167, 167, 167, 0.15) solid;
     padding: 0;
+    margin-top: 6px;
+    min-height:58px;
 }
 
 body.page-1 span.pageIndicatorCircle-1:before,
@@ -235,7 +246,7 @@ div.actionBar {
 button.actionButton {
     padding: 12px 21px;
     margin: auto 0;
-    min-width: 194px;
+    /* min-width: 194px; */
     height: 58px;
     border: 1px solid #26374A;
     font-size: 22px;
@@ -271,14 +282,18 @@ div.page1-recheckButtonbar {
 }
 
 button.secondaryButton {
-    min-width: 105px;
-    padding: 12px 21px;
-    height: 43px;
+    box-sizing: border-box;
+    padding: 8px 20px;
     font-size: 16px;
     background-color: #EAEBED;
     border-color: #DCDEE1;
     color: #335075;
     border-radius: 5px;
+}
+
+button.secondaryButton span{
+   padding-bottom: 64px;
+   padding-top:0px
 }
 
 button.secondaryButton>img.button-icon {
@@ -353,8 +368,8 @@ div.form-field>span.validationStatusErrorMessage {
     padding-left: 5px; */
 }
 
-div.form-field-error>span.validationStatusErrorMessage {
-    display: inherit;
+div.form-field-error input {
+    border: 2px solid red;
 }
 
 ul.validationEntries>li.success>span.validationStatusSuccess,
@@ -399,6 +414,37 @@ div.form-field>input[type="checkbox"]~div.form-field {
 }
 
 div.form-field>input[type="text"] {
+    width: 100%;
+    height: 40px;
+    font-size: 20px;
+    border: 1px solid #CACACA;
+    padding: 2px 2px 2px 20px;
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+.input-error label{
+    color: red !important;
+}
+
+.input-error input{
+    border: 1px solid red !important;
+    color: red !important;
+}
+
+.input-error div{
+    color: red !important;
+}
+
+.input-error select{
+    border: 1px solid red !important;
+    color: black;
+}
+
+.input-error select option:first-of-type{
+    color: red;
+}
+
+div.form-field>input[type="date"] {
     width: 100%;
     height: 40px;
     font-size: 20px;

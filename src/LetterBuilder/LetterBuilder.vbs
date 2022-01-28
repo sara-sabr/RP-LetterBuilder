@@ -357,8 +357,9 @@ Sub PopulateScreenCADFields(flag)
             window.setTimeOut "RunPopulateScreenCADFields(1)", 2000, "VBScript"
         Case Else
     End Select
-    
-    
+
+    showDateError document.getElementById("EffectiveDate"), false
+    validateForm()
 End Sub
 
 Sub RunPopulateScreenCADFields(flag)
@@ -453,22 +454,7 @@ Sub GenerateFrenchLetter()
     GenerateLetter(letterFrFile)
 End Sub
 
-' Adds in the slashes while typing in the effective Date
-Sub EffectiveDateFormatting(newEvent)
-    Set currentDate = document.getElementById(newEvent.target.name)
-    key = Mid(newEvent.target.value, Len(currentDate.value), Len(currentDate.value)) 
-    
-    If(IsNumeric(key) AND Len(currentDate.value) <= 10) Then
-        If Len(currentDate.value) = 2 OR Len(currentDate.value) = 5 Then
-        tempDate = currentDate.value & "/"
-        currentDate.value = tempDate
-        End If
-    Else
-        currentDate.value = Mid(currentDate.value, 1, Len(currentDate.value) -1) 
-    End If
 
-    ValidatePage1()
-End Sub
 ' Generate Letter Helper
 Sub GenerateLetter(letterFile)
     ToggleWordGenerateButtons(false)
@@ -1255,38 +1241,6 @@ Function ToggleWorkInProgress(isVisible)
     End If
 End Function
 
-Sub ValidatePage1()
-    Set letterSelect = document.getElementById("selectLetter")
-    Set languageSelect = document.getElementById("selectLanguage")
-    Set dateInput = document.getElementById("inputEffectiveDate")
-
-    If letterSelect.value <> "--" Then
-        languageSelect.Disabled = false
-
-        If selectLanguage.value <> "--" Then
-            dateInput.Disabled = false
-
-            If Len(dateInput.value) = 10 Then
-                TogglePage1StartButton(true)
-            Else
-                TogglePage1StartButton(false)
-            End If
-        Else
-            dateInput.Disabled = true
-            TogglePage1StartButton(false)
-        End If
-
-    Else
-        languageSelect.Disabled = true
-        dateInput.Disabled = true
-        TogglePage1StartButton(false)
-    End If
-End Sub
-
-Function TogglePage1StartButton(isEnabled)
-    document.getElementById("page1ButtonStart").Disabled = Not(isEnabled)
-End Function
-
 Function ToggleNotCheck(parent, child)
     document.getElementbyID(child).checked = NOT document.getElementbyID(parent).checked
 End Function
@@ -1388,29 +1342,6 @@ Function ShowProgressOverlay(isOn)
     ' Turn on the indicator
     document.getElementById("progress-overlay").className = classValue
 
-End Function
-
-' Toggle Error
-' All validation of forms in the letterbuilder
-Function validateForm()
-    Dim targetElement
-    ' Validate EffectiveDate
-    Set targetElement = document.getElementById("EffectiveDate")
-    If validateAndFormatDate(targetElement.value) = "" Then
-        ToggleWordGenerateButtons(false)
-    Else
-        ToggleWordGenerateButtons(true)
-    End If
-    ' Validate DCP Plan No
-    Set targetElement = document.getElementById("DCPPlanNo")
-    Set targetCheckbox = document.getElementById("DCPStatus")
-    If targetElement.value = "" AND targetCheckbox.checked = true Then
-        ToggleWordGenerateButtons(false)
-        targetElement.parentElement.className = "form-field form-field-error"
-    Else
-        ToggleWordGenerateButtons(true)
-        targetElement.parentElement.className = "form-field"
-    End If
 End Function
 
 Function GoToPage1()

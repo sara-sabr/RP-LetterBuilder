@@ -109,7 +109,7 @@ I18N.Add "SelffundedLabel",			Array("Self funded", "Retenues pour congé autofin
 I18N.Add "ParentalLabel",			Array("Parental Leave", "Fin du congé de maternité/parental")
 I18N.Add "GradualLabel",			Array("Gradual Return to Work", "Retour progressif au travail")
 I18N.Add "ParkingLabel",			Array("Parking", "Retenues pour les frais de stationnement")
-I18N.Add "InvCheck-CasualorStudentLabel",	Array("Casual/Student", "Occasionnel/étudiant")
+I18N.Add "InvCheckCasualorStudentLabel",	Array("Non Casual/Student", "Non Occasionnel/étudiant")
 I18N.Add "BackToBackLabel",	        Array("Back to Back LWOP", "CNP dos à dos")
 I18N.Add "PartTimeEmployeeLabel",	Array("Part-Time", "À temps partiel")
 I18N.Add "PSHCPLevel1",				Array("Level 1", "Niveau 1")
@@ -1072,14 +1072,17 @@ Function GetCadDataGroup(index, cadDict, employeeId)
 ' Sheets
     Dim sheetJob
     Set sheetJob = excelWorkbook.Worksheets(CAD_SHEET_JOB)
-    group = sheetJob.Range("D3").Value
-    If group <> "CAD" AND group <> "CAS" AND group <> "SSB" AND group <> "STS" Then
-        cadDict.add "InvCheck-CasualorStudent", ""
+
+    group = FindRowUsingNoAdditionalFilter(sheetJob, "A2", employeeId, 2, 4, true)
+
+    If group = "CAD" OR group = "CAS" OR group = "SSB" OR group = "STS" Then
+        cadDict.add "InvCheckCasualorStudent", "1"
     Else
-        cadDict.add "InvCheck-CasualorStudent", "1"
+        cadDict.add "InvCheckCasualorStudent", ""
     End If
     Set sheetJob = Nothing
 End Function
+
 Function GetCadFullPartTime(index, cadDict, employeeId)
 ' Sheets
     Dim sheetJob
